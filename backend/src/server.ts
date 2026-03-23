@@ -3,6 +3,7 @@ import express from "express";
 import { CLIENT_URL, PORT } from "./lib/env";
 import { globalErrorHandler } from "./lib/error";
 import categoryRoutes from "./modules/category/category.routes";
+import bookingRoutes from "./modules/booking/booking.routes";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cors({
 
 app.use(express.json())
 app.use("/api/categories", categoryRoutes)
+app.use("/api/bookings", authenticate, bookingRoutes);
 
 app.use(globalErrorHandler)
 
