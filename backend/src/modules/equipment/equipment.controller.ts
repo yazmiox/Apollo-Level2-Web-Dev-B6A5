@@ -38,3 +38,13 @@ export const createEquipment = async (req: Request, res: Response, next: NextFun
         next(error);
     }
 }
+
+export const updateEquipment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const equipment = await equipmentService.updateEquipment(id as string, req.body);
+        res.status(200).json({ status: "success", data: equipment });
+    } catch (error) {
+        next(error);
+    }
+}

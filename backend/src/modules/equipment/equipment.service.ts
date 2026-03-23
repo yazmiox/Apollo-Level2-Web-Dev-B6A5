@@ -1,8 +1,9 @@
 import prisma from "../../lib/prisma";
 import { ApiError } from "../../utils/ApiError";
-import { CreateEquipmentInput } from "./equipment.schema";
+import { CreateEquipmentInput, UpdateEquipmentInput } from "./equipment.schema";
 
 export const getAllEquipments = async (filters?: any) => {
+    // Gotta implement filtering by status, category, etc. here
     const equipments = await prisma.equipment.findMany({
         where: filters,
         include: { category: true }
@@ -28,4 +29,17 @@ export const createEquipment = async (data: CreateEquipmentInput) => {
         data: data
     });
     return equipment;
+}
+
+export const updateEquipment = async (id: string, data: UpdateEquipmentInput) => {
+    const existing = await prisma.equipment.findUnique({ where: { id } });
+    if (!existing) {
+        throw new ApiError(404, "Equipment not found");
+    }
+
+    const updated = await prisma.equipment.update({
+        where: { id },
+        data: data
+    });
+    return updated;
 }
