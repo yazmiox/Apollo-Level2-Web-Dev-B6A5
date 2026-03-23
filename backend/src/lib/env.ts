@@ -6,5 +6,7 @@ export const {
     DIRECT_URL,
     CLIENT_URL,
     STRIPE_SECRET_KEY,
-    STRIPE_WEBHOOK_SECRET
+    STRIPE_WEBHOOK_SECRET,
+    EMAIL,
+    EMAIL_APP_PASS
 } = process.env
