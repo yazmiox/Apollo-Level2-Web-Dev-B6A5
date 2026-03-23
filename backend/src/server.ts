@@ -22,6 +22,7 @@ app.use(cors({
     credentials: true
 }))
 
+app.all("/api/auth/{*any}", toNodeHandler(auth))
 app.use(express.json())
 
 app.use("/api/stats", authenticate, statsRoutes)
