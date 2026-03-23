@@ -1,0 +1,38 @@
+import { z } from "zod";
+import { EquipmentCondition, EquipmentStatus } from "../../generated/prisma/enums";
+
+export const createEquipmentSchema = z.object({
+    name: z.string({
+        error: "Name is required",
+    }).min(2, "Name must be at least 2 characters").max(100),
+
+    slug: z.string({
+        error: "Slug is required",
+    }).min(2).max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
+
+    description: z.string({
+        error: "Description is required",
+    }).min(10, "Description must be at least 10 characters"),
+
+    categoryId: z.string({
+        error: "Category ID is required",
+    }),
+
+    brand: z.string().optional().nullable(),
+    modelName: z.string().optional().nullable(),
+    location: z.string().optional().nullable(),
+    imageUrl: z.url("Invalid image URL").optional().nullable(),
+    condition: z.enum(EquipmentCondition).default("GOOD"),
+    status: z.enum(EquipmentStatus).default("AVAILABLE"),
+    rentalRate: z.number({
+        error: "Rental rate is required",
+    }).positive("Rental rate must be positive"),
+
+    requiresApproval: z.boolean().default(true),
+    isFeatured: z.boolean().default(false),
+});
+
+export const updateEquipmentSchema = createEquipmentSchema.partial();
+
+export type CreateEquipmentInput = z.infer<typeof createEquipmentSchema>;
+export type UpdateEquipmentInput = z.infer<typeof updateEquipmentSchema>;

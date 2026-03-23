@@ -29,3 +29,12 @@ export const getEquipment = async (req: Request, res: Response, next: NextFuncti
         next(error);
     }
 }
+
+export const createEquipment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const equipment = await equipmentService.createEquipment(req.body);
+        res.status(201).json({ status: "success", data: equipment });
+    } catch (error) {
+        next(error);
+    }
+}
