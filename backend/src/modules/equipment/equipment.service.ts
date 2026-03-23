@@ -7,3 +7,11 @@ export const getAllEquipments = async (filters?: any) => {
     });
     return equipments;
 }
+
+export const getEquipmentBySlug = async (slug: string) => {
+    const equipment = await prisma.equipment.findUnique({
+        where: { slug },
+        include: { category: true }
+    });
+    return equipment;
+}
