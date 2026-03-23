@@ -43,3 +43,11 @@ export const updateEquipment = async (id: string, data: UpdateEquipmentInput) =>
     });
     return updated;
 }
+
+export const deleteEquipment = async (id: string) => {
+    const existing = await prisma.equipment.findUnique({ where: { id } });
+    if (!existing) {
+        throw new ApiError(404, "Equipment not found");
+    }
+    await prisma.equipment.delete({ where: { id } });
+}

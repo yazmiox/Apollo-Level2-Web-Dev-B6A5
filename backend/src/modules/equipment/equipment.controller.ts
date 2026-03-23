@@ -48,3 +48,13 @@ export const updateEquipment = async (req: Request, res: Response, next: NextFun
         next(error);
     }
 }
+
+export const deleteEquipment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        await equipmentService.deleteEquipment(id as string);
+        res.status(200).json({ status: "success", message: "Equipment deleted successfully" });
+    } catch (error) {
+        next(error);
+    }
+}

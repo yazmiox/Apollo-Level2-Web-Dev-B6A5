@@ -14,5 +14,6 @@ router.get("/:slug", equipmentController.getEquipment);
 // Protected routes (Admin only)
 router.post("/", authenticate, validateRole("admin"), validateRequest(createEquipmentSchema), equipmentController.createEquipment);
 router.patch("/:id", authenticate, validateRole("admin"), validateRequest(updateEquipmentSchema), equipmentController.updateEquipment);
+router.delete("/:id", authenticate, validateRole("admin"), equipmentController.deleteEquipment);
 
 export default router;
