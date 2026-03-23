@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EquipmentStatus {
+  AVAILABLE
+  MAINTENANCE
+  DAMAGED
+  ARCHIVED
+}
+
+enum EquipmentCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  POOR
+}
+
+enum BookingStatus {
+  PENDING_APPROVAL
+  AWAITING_PAYMENT
+  CONFIRMED
+  ACTIVE
+  RETURNED
+  REJECTED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id               String    @id
+  name             String
+  email            String
+  emailVerified    Boolean   @default(false)
+  image            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  role             String    @default("user")
+  sessions         Session[]
+  accounts         Account[]
+  bookings         Booking[] @relation("UserBookings")
+  approvedBookings Booking[] @relation("ApprovedBookings")
+  payments         Payment[] @relation("UserPayments")
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Category {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?
+  equipments  Equipment[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Equipment {
+  id               String             @id @default(cuid())
+  name             String
+  slug             String             @unique
+  description      String
+  categoryId       String
+  category         Category           @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  brand            String?
+  modelName        String?
+  location         String?
+  imageUrl         String?
+  condition        EquipmentCondition @default(GOOD)
+  status           EquipmentStatus    @default(AVAILABLE)
+  rentalRate       Decimal            @db.Decimal(10, 2)
+  requiresApproval Boolean            @default(true)
+  isFeatured       Boolean            @default(false)
+  bookings         Booking[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([categoryId])
+  @@index([status])
+}
+
+model Booking {
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation("UserBookings", fields: [userId], references: [id], onDelete: Cascade)
+  equipmentId       String
+  equipment         Equipment     @relation(fields: [equipmentId], references: [id], onDelete: Restrict)
+  startDate         DateTime
+  endDate           DateTime
+  status            BookingStatus @default(PENDING_APPROVAL)
+  amount            Decimal       @db.Decimal(10, 2)
+  notes             String?
+  approvedByAdminId String?
+  approvedByAdmin   User?         @relation("ApprovedBookings", fields: [approvedByAdminId], references: [id], onDelete: SetNull)
+  approvedAt        DateTime?
+  checkedOutAt      DateTime?
+  returnedAt        DateTime?
+  returnNotes       String?
+  payment           Payment?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([equipmentId])
+  @@index([status])
+  @@index([startDate, endDate])
+}
+
+model Payment {
+  id                      String        @id @default(cuid())
+  bookingId               String        @unique
+  booking                 Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  userId                  String
+  user                    User          @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+  amount                  Decimal       @db.Decimal(10, 2)
+  currency                String        @default("usd")
+  status                  PaymentStatus @default(PENDING)
+  stripeCheckoutSessionId String?       @unique
+  stripePaymentIntentId   String?       @unique
+  paidAt                  DateTime?
+  refundedAt              DateTime?
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
