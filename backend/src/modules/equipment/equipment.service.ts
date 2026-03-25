@@ -1,6 +1,11 @@
+import { randomUUID } from "node:crypto";
 import prisma from "../../lib/prisma";
+import { getPutObjectUrl } from "../../lib/s3";
 import { ApiError } from "../../utils/ApiError";
-import { CreateEquipmentInput, UpdateEquipmentInput } from "./equipment.schema";
+import {
+    CreateEquipmentInput, UpdateEquipmentInput, CreateEquipmentImageUploadInput
+} from "./equipment.schema";
+import { extname } from "node:path";
 
 export const getAllEquipments = async (filters?: any) => {
     // Gotta implement filtering by status, category, etc. here
@@ -18,6 +23,35 @@ export const getEquipmentBySlug = async (slug: string) => {
     });
     return equipment;
 }
+
+export const createEquipmentImageUpload = async (data: CreateEquipmentImageUploadInput) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+
+    if (!allowedTypes.includes(data.contentType)) {
+        throw new ApiError(400, "Invalid image type");
+    }
+
+    if (data.size > 5 * 1024 * 1024) {
+        throw new ApiError(400, "Image must be 5MB or smaller");
+    }
+
+    const extensionMap: Record<string, string> = {
+        "image/jpeg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+        "image/avif": ".avif",
+    };
+
+    const extension = extname(data.fileName) || extensionMap[data.contentType] || "";
+    const key = `equipment/${randomUUID()}${extension}`;
+
+    const uploadUrl = await getPutObjectUrl({
+        Key: key,
+        ContentType: data.contentType,
+    });
+
+    return { key, uploadUrl };
+};
 
 export const createEquipment = async (data: CreateEquipmentInput) => {
     const category = await prisma.category.findUnique({ where: { id: data.categoryId } });

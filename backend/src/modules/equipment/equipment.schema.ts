@@ -34,5 +34,12 @@ export const createEquipmentSchema = z.object({
 
 export const updateEquipmentSchema = createEquipmentSchema.partial();
 
+export const createEquipmentImageUploadSchema = z.object({
+    fileName: z.string().min(1, "File name is required"),
+    contentType: z.string().min(1, "Content type is required"),
+    size: z.number().positive("File size must be greater than 0"),
+});
+
+export type CreateEquipmentImageUploadInput = z.infer<typeof createEquipmentImageUploadSchema>;
 export type CreateEquipmentInput = z.infer<typeof createEquipmentSchema>;
 export type UpdateEquipmentInput = z.infer<typeof updateEquipmentSchema>;

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as equipmentController from "./equipment.controller";
 import { validateRequest } from "../../middlewares/validateRequest";
-import { createEquipmentSchema, updateEquipmentSchema } from "./equipment.schema";
+import { createEquipmentImageUploadSchema, createEquipmentSchema, updateEquipmentSchema } from "./equipment.schema";
 import { authenticate } from "../../middlewares/auth";
 import { validateRole } from "../../middlewares/validateRole";
 
@@ -12,6 +12,7 @@ router.get("/", equipmentController.getAllEquipments);
 router.get("/:slug", equipmentController.getEquipment);
 
 // Protected routes (Admin only)
+router.post("/upload-url", authenticate, validateRole("admin"), validateRequest(createEquipmentImageUploadSchema), equipmentController.createEquipmentImageUploadUrl);
 router.post("/", authenticate, validateRole("admin"), validateRequest(createEquipmentSchema), equipmentController.createEquipment);
 router.patch("/:id", authenticate, validateRole("admin"), validateRequest(updateEquipmentSchema), equipmentController.updateEquipment);
 router.delete("/:id", authenticate, validateRole("admin"), equipmentController.deleteEquipment);

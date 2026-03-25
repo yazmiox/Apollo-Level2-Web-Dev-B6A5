@@ -30,6 +30,15 @@ export const getEquipment = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
+export const createEquipmentImageUploadUrl = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await equipmentService.createEquipmentImageUpload(req.body);
+        res.status(200).json({ status: "success", data: result });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const createEquipment = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const equipment = await equipmentService.createEquipment(req.body);
