@@ -4,12 +4,26 @@ import { formatDateShort } from "@/app/utils";
 import { ArrowRight, Banknote, Box, Calendar, Check, ChevronRight, Clock, Loader2, UserCheck, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
+import { updateBookingStatus } from "../../actions/booking";
 
 export default function AdminOverview({ stats }: { stats: any }) {
   const [pendingRequests, setPendingRequests] = useState(stats.pendingRequests);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const handleStatusChange = async (id: string, status: string) => {
+    setLoadingId(id + "_" + status);
+    try {
+      await updateBookingStatus(id, status);
+      setPendingRequests((prev: any[]) =>
+        prev.map((req) => (req.id === id ? { ...req, status } : req))
+      );
+      toast.success(`Booking ${status.toLowerCase().replace("_", " ")} successfully`);
+    } catch (error) {
+      toast.error("Failed to update booking status");
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   const statsArr = [
