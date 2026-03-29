@@ -1,5 +1,6 @@
 import { getSession } from "../lib/auth-server";
 import AdminOverview from "./_components/AdminOverview";
+import UserOverview from "./_components/UserOverview";
 import { getStats } from "../actions/stats";
 import { redirect } from "next/navigation";
 
@@ -16,5 +17,5 @@ export default async function DashboardPage() {
     return <AdminOverview stats={stats} />;
   }
 
-  return <div>User Overview</div>
+  return <UserOverview stats={stats} userName={user.name || "User"} />;
 }
