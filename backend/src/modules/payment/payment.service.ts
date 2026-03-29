@@ -37,7 +37,7 @@ export const createCheckoutSession = async (userId: string, bookingId: string) =
             userId
         },
         mode: "payment",
-        success_url: `${CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${CLIENT_URL}/success`,
         cancel_url: `${CLIENT_URL}/cancel`,
         client_reference_id: booking.id
     })
