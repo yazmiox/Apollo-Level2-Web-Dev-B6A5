@@ -4,13 +4,12 @@ import { Calendar, LayoutDashboard, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { authClient } from "../lib/auth-client";
 import Logo from "./Logo";
 
 export default function Navbar() {
-  const user = {
-    name: "Yasin Ahmed",
-    email: "yasin@gmail.com"
-  }
+  const { data, isPending } = authClient.useSession()
+  const user = data?.user
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -32,6 +31,7 @@ export default function Navbar() {
   const initials = user?.name.split(" ").map((n: string) => n[0]).join("").toUpperCase();
 
   const signOut = async () => {
+    await authClient.signOut()
   }
 
   return (
