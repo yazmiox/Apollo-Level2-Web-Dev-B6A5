@@ -4,6 +4,7 @@ import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { authClient } from "../lib/auth-client";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,8 +17,26 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const res = await authClient.signUp.email({
+      name,
+      email,
+      password
+    }, {
+      onRequest: () => {
+        setError(null)
+        setIsRegistering(true);
+      },
+      onSuccess: () => {
+        router.push('/verify-email')
+        setIsRegistering(false);
+      },
+      onError: (ctx) => {
+        setError(ctx.error.message);
+        setIsRegistering(false);
+      }
+    })
 
-    console.log('User Registered:')
+    console.log('User Registered:', res)
   };
 
   return (
