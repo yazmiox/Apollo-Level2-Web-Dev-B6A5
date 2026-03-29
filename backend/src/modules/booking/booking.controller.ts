@@ -5,7 +5,7 @@ import { ApiError } from "../../utils/ApiError";
 export const checkAvailability = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const availability = await bookingService.checkAvailability(req.body);
-        res.status(200).json({ status: "success", data: availability });
+        res.status(200).json({ success: true, data: availability });
     } catch (error) {
         next(error);
     }
@@ -18,7 +18,7 @@ export const getMyBookings = async (req: Request, res: Response, next: NextFunct
         if (!userId) throw new ApiError(401, "Unauthorized");
 
         const bookings = await bookingService.getAllBookings({ userId });
-        res.status(200).json({ status: "success", data: bookings });
+        res.status(200).json({ success: true, data: bookings });
     } catch (error) {
         next(error);
     }
@@ -27,7 +27,7 @@ export const getMyBookings = async (req: Request, res: Response, next: NextFunct
 export const getAllBookings = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const bookings = await bookingService.getAllBookings();
-        res.status(200).json({ status: "success", data: bookings });
+        res.status(200).json({ success: true, data: bookings });
     } catch (error) {
         next(error);
     }
@@ -37,7 +37,7 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
     try {
         const userId = (req as any).user?.id;
         const booking = await bookingService.createBooking(userId, req.body);
-        res.status(201).json({ status: "success", data: booking });
+        res.status(201).json({ success: true, data: booking });
     } catch (error) {
         next(error);
     }
@@ -50,7 +50,7 @@ export const updateBookingStatus = async (req: Request, res: Response, next: Nex
         const adminId = (req as any).user?.id;
 
         const booking = await bookingService.updateBookingStatus(id as string, status, adminId);
-        res.status(200).json({ status: "success", data: booking });
+        res.status(200).json({ success: true, data: booking });
     } catch (error) {
         next(error);
     }
