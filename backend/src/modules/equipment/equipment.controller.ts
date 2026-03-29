@@ -4,14 +4,19 @@ import * as equipmentService from "./equipment.service";
 
 export const getAllEquipments = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // TODO: implement filter
-        const { category, status } = req.query;
         const filters: any = {};
-        if (category) filters.categoryId = category;
+        const { q, category, status, sort, page, limit, isFeatured } = req.query;
+
+        if (q) filters.q = q;
+        if (category) filters.category = category;
         if (status) filters.status = status;
+        if (sort) filters.sort = sort;
+        if (page) filters.page = page;
+        if (limit) filters.limit = limit;
+        if (isFeatured) filters.isFeatured = isFeatured === "true";
 
         const equipments = await equipmentService.getAllEquipments(filters);
-        res.status(200).json({ status: "success", data: equipments });
+        res.status(200).json({ success: true, ...equipments });
     } catch (error) {
         next(error);
     }

@@ -18,17 +18,17 @@ export const createEquipmentSchema = z.object({
         error: "Category ID is required",
     }),
 
-    brand: z.string().optional().nullable(),
-    modelName: z.string().optional().nullable(),
-    location: z.string().optional().nullable(),
-    imageUrl: z.url("Invalid image URL").optional().nullable(),
+    brand: z.string(),
+    modelName: z.string(),
+    location: z.string(),
+    imageKey: z.string("Invalid image URL"),
     condition: z.enum(EquipmentCondition).default("GOOD"),
     status: z.enum(EquipmentStatus).default("AVAILABLE"),
     rentalRate: z.number({
         error: "Rental rate is required",
     }).positive("Rental rate must be positive"),
-
-    requiresApproval: z.boolean().default(true),
+    includedItems: z.array(z.string()),
+    specifications: z.json(),
     isFeatured: z.boolean().default(false),
 });
 

@@ -1,19 +1,97 @@
 import { randomUUID } from "node:crypto";
 import prisma from "../../lib/prisma";
-import { getPutObjectUrl } from "../../lib/s3";
+import { getObjectUrl, getPutObjectUrl } from "../../lib/s3";
 import { ApiError } from "../../utils/ApiError";
 import {
     CreateEquipmentInput, UpdateEquipmentInput, CreateEquipmentImageUploadInput
 } from "./equipment.schema";
 import { extname } from "node:path";
+import { EquipmentWhereInput } from "../../generated/prisma/models";
+import { EquipmentStatus } from "../../generated/prisma/enums";
 
-export const getAllEquipments = async (filters?: any) => {
-    // Gotta implement filtering by status, category, etc. here
-    const equipments = await prisma.equipment.findMany({
-        where: filters,
-        include: { category: true }
-    });
-    return equipments;
+export const getAllEquipments = async (params: {
+    q?: string,
+    category?: string,
+    status?: EquipmentStatus | "all",
+    sort?: string,
+    page?: number | string,
+    limit?: number | string,
+    isFeatured?: boolean
+} = {}) => {
+    const pageNum = Number(params.page) || 1;
+    const limitNum = Number(params.limit) || 9;
+    const skip = (pageNum - 1) * limitNum;
+
+    const { q, category, status, sort, isFeatured } = params;
+
+    const where: EquipmentWhereInput = {};
+
+    if (q) {
+        where.OR = [
+            { name: { contains: q, mode: "insensitive" } },
+            { category: { name: { contains: q, mode: "insensitive" } } },
+        ];
+    }
+
+    if (isFeatured) {
+        where.isFeatured = isFeatured;
+    }
+
+    if (category && category !== "all") {
+        const categoryData = await prisma.category.findUnique({ where: { slug: category } });
+        where.categoryId = categoryData ? categoryData.id : "";
+    }
+
+    if (status && status !== "all") {
+        where.status = status;
+    }
+
+    const orderBy: any = {};
+    if (sort === "price-asc") orderBy.rentalRate = "asc";
+    else if (sort === "price-desc") orderBy.rentalRate = "desc";
+    else if (sort === "name-asc") orderBy.name = "asc";
+    else orderBy.createdAt = "desc";
+
+    const [equipments, total, ratings] = await Promise.all([
+        prisma.equipment.findMany({
+            where,
+            include: {
+                category: true,
+                _count: { select: { reviews: true } }
+            },
+            orderBy,
+            skip,
+            take: limitNum,
+        }),
+        prisma.equipment.count({ where }),
+        prisma.review.groupBy({
+            by: ['equipmentId'],
+            _avg: { rating: true }
+        })
+    ]);
+
+    const equipmentsWithDetails = await Promise.all(
+        equipments.map(async (e) => {
+            const imageUrl = await getObjectUrl(e.imageKey);
+            const avgRating = ratings.find(r => r.equipmentId === e.id)?._avg.rating || 0;
+            return {
+                ...e,
+                imageUrl,
+                rating: avgRating,
+                reviewCount: e._count.reviews
+            };
+        })
+    );
+
+    return {
+        data: equipmentsWithDetails,
+        metadata: {
+            total,
+            page: pageNum,
+            limit: limitNum,
+            totalPages: Math.ceil(total / limitNum)
+        }
+    };
 }
 
 export const getEquipmentBySlug = async (slug: string) => {
