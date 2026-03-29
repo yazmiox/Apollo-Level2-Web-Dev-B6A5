@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import FeaturedEquipments from "./components/FeaturedEquipments";
+import FeaturedEquipmentsSkeleton from "./components/FeaturedEquipmentsSkeleton";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 
@@ -156,6 +159,11 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ── Section 4: Featured Equipment ── */}
+        <Suspense fallback={<FeaturedEquipmentsSkeleton />}>
+          <FeaturedEquipments />
+        </Suspense>
 
         {/* ── Section 5: Benefits ── */}
         <section id="benefits" className="bg-[#f4f1ed] py-24 lg:py-32">
