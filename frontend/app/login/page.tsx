@@ -4,6 +4,7 @@ import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { authClient } from "../lib/auth-client";
 import Logo from "../components/Logo";
 
 export default function LoginPage() {
@@ -16,6 +17,23 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    await authClient.signIn.email({
+      email,
+      password
+    }, {
+      onRequest: () => {
+        setError(null)
+        setIsLoggingIn(true);
+      },
+      onSuccess: () => {
+        router.push('/dashboard')
+        setIsLoggingIn(false);
+      },
+      onError: (ctx) => {
+        setError(ctx.error.message);
+        setIsLoggingIn(false);
+      }
+    })
   };
 
   return (
