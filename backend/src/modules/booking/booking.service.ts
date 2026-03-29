@@ -1,5 +1,6 @@
 import { BookingStatus, EquipmentStatus } from "../../generated/prisma/enums";
 import prisma from "../../lib/prisma";
+import { getObjectUrl } from "../../lib/s3";
 import { ApiError } from "../../utils/ApiError";
 import { CheckAvailabilityInput, CreateBookingInput } from "./booking.schema";
 
@@ -39,25 +40,61 @@ const calculateBookingAmount = (rentalRate: number, start: Date, end: Date) => {
 };
 
 export const getAllBookings = async (filters: Record<string, unknown> = {}) => {
-    return prisma.booking.findMany({
+    const bookings = await prisma.booking.findMany({
         where: filters,
         include: {
             user: true,
             equipment: true,
             payment: true,
+            review: true,
         }
     });
+
+    return Promise.all(
+        bookings.map(async (booking) => {
+            const imageUrl = booking.equipment?.imageKey
+                ? await getObjectUrl(booking.equipment.imageKey)
+                : null;
+
+            return {
+                ...booking,
+                equipment: booking.equipment
+                    ? {
+                        ...booking.equipment,
+                        imageUrl,
+                    }
+                    : null,
+            };
+        })
+    );
 };
 
 export const getBookingById = async (id: string) => {
-    return prisma.booking.findUnique({
+    const booking = await prisma.booking.findUnique({
         where: { id },
         include: {
             user: true,
             equipment: true,
             payment: true,
+            review: true,
         }
     });
+
+    if (!booking) return null;
+
+    const imageUrl = booking.equipment?.imageKey
+        ? await getObjectUrl(booking.equipment.imageKey)
+        : null;
+
+    return {
+        ...booking,
+        equipment: booking.equipment
+            ? {
+                ...booking.equipment,
+                imageUrl,
+            }
+            : null,
+    };
 };
 
 export const checkAvailability = async (data: CheckAvailabilityInput) => {

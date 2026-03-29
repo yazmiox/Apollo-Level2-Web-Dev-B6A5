@@ -138,9 +138,10 @@ export const createEquipment = async (data: CreateEquipmentInput) => {
     }
 
     const equipment = await prisma.equipment.create({
-        data: data
+        data: data as any
     });
-    return equipment;
+    const equipmentImageUrl = await getObjectUrl(equipment.imageKey)
+    return { ...equipment, imageUrl: equipmentImageUrl };
 }
 
 export const updateEquipment = async (id: string, data: UpdateEquipmentInput) => {
@@ -151,9 +152,10 @@ export const updateEquipment = async (id: string, data: UpdateEquipmentInput) =>
 
     const updated = await prisma.equipment.update({
         where: { id },
-        data: data
+        data: data as any
     });
-    return updated;
+    const equipmentImageUrl = await getObjectUrl(updated.imageKey)
+    return { ...updated, imageUrl: equipmentImageUrl };
 }
 
 export const deleteEquipment = async (id: string) => {
