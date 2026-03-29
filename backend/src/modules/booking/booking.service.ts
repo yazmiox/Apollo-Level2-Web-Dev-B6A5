@@ -119,7 +119,10 @@ export const checkAvailability = async (data: CheckAvailabilityInput) => {
 
     return {
         available: !overlapping,
-        conflictingBookingId: overlapping?.id ?? null,
+        conflict: overlapping ? {
+            startDate: overlapping.startDate,
+            endDate: overlapping.endDate,
+        } : null,
     };
 };
 
