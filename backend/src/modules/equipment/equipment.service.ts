@@ -97,9 +97,54 @@ export const getAllEquipments = async (params: {
 export const getEquipmentBySlug = async (slug: string) => {
     const equipment = await prisma.equipment.findUnique({
         where: { slug },
-        include: { category: true }
+        include: {
+            category: true,
+            _count: {
+                select: { reviews: true }
+            }
+        }
     });
-    return equipment;
+
+    if (!equipment) {
+        throw new ApiError(404, "Equipment not found");
+    }
+
+    const [ratingAggregate, reviews, equipmentImageUrl, relatedEquipments] = await Promise.all([
+        prisma.review.aggregate({
+            where: { equipmentId: equipment.id },
+            _avg: { rating: true }
+        }),
+        prisma.review.findMany({
+            where: { equipmentId: equipment.id },
+            include: { user: { select: { name: true, image: true } } },
+            orderBy: { createdAt: "desc" }
+        }),
+        getObjectUrl(equipment.imageKey),
+        prisma.equipment.findMany({
+            where: {
+                categoryId: equipment.categoryId,
+                NOT: { id: equipment.id },
+            },
+            take: 3,
+            include: { category: true }
+        })
+    ]);
+
+    const relatedWithUrls = await Promise.all(
+        relatedEquipments.map(async (e) => ({
+            ...e,
+            imageUrl: await getObjectUrl(e.imageKey),
+        }))
+    );
+
+    return {
+        ...equipment,
+        imageUrl: equipmentImageUrl,
+        rating: ratingAggregate._avg.rating || 0,
+        reviewCount: equipment._count.reviews,
+        reviews,
+        related: relatedWithUrls
+    };
 }
 
 export const createEquipmentImageUpload = async (data: CreateEquipmentImageUploadInput) => {
