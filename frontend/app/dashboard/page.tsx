@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
-import { getStats } from "../actions/stats";
 import { getSession } from "../lib/auth-server";
+import AdminOverview from "./_components/AdminOverview";
+import { getStats } from "../actions/stats";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -12,7 +13,7 @@ export default async function DashboardPage() {
   const user = session.user;
 
   if (user.role === "admin") {
-    return <div>Admin Overview</div>
+    return <AdminOverview stats={stats} />;
   }
 
   return <div>User Overview</div>
