@@ -52,6 +52,26 @@ export const getAllEquipments = async (params: any = {}) => {
   }
 };
 
+export const getAllCategories = async () => {
+  try {
+    const response = await httpClient.get(`/categories`);
+    return response.success ? response.data : [];
+  } catch (error: any) {
+    console.error("Error getting categories:", error);
+    return [];
+  }
+};
+
+export const getEquipmentBySlug = async (slug: string) => {
+  try {
+    const response = await httpClient.get(`/equipment/${slug}`);
+    return response;
+  } catch (error: any) {
+    console.error("Error getting equipment by slug:", error);
+    return null;
+  }
+};
+
 export const getTestimonials = async () => {
   try {
     const response = await httpClient.get(`/reviews/testimonial`);
