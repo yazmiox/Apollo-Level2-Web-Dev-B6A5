@@ -23,3 +23,13 @@ export const getAllEquipments = async (params: any = {}) => {
     return { success: false, data: [], metadata: { total: 0, page: 1, limit: 9, totalPages: 0 } };
   }
 };
+
+export const getTestimonials = async () => {
+  try {
+    const response = await httpClient.get(`/reviews/testimonial`);
+    return response.success ? response.data : [];
+  } catch (error: any) {
+    console.error("Error getting testimonials:", error);
+    return [];
+  }
+};

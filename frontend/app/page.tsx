@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import FeaturedEquipments from "./components/FeaturedEquipments";
-import FeaturedEquipmentsSkeleton from "./components/FeaturedEquipmentsSkeleton";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import Testimonials from "./components/Testimonials";
+import TestimonialsSkeleton from "./components/TestimonialsSkeleton";
+import FeaturedEquipmentsSkeleton from "./components/FeaturedEquipmentsSkeleton";
 
 const howItWorksSteps = [
   { number: "01", icon: "🔍", title: "Browse the Catalog", description: "Explore available equipment filtered by category, condition, and availability. See real-time status on every item." },
@@ -191,6 +193,11 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ── Section 6: Testimonials ── */}
+        <Suspense fallback={<TestimonialsSkeleton />}>
+          <Testimonials />
+        </Suspense>
 
         {/* ── Section 7: CTA ── */}
         <section className="relative overflow-hidden bg-[#e8612e] py-24 lg:py-32">
