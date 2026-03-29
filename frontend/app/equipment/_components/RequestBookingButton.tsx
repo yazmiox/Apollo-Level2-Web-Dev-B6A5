@@ -2,6 +2,7 @@
 
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
+import BookingModal from "../[slug]/BookingModal";
 
 export default function RequestBookingButton({ item }: { item: any }) {
     const [modalOpen, setModalOpen] = useState(false);
@@ -14,6 +15,14 @@ export default function RequestBookingButton({ item }: { item: any }) {
                 <CalendarIcon size={16} />
                 Request Booking
             </button>
+
+            {/* ── Booking Modal ── */}
+            {modalOpen && (
+                <BookingModal
+                    item={item}
+                    onClose={() => setModalOpen(false)}
+                />
+            )}
         </>
     )
 }
