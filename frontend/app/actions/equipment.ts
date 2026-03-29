@@ -72,6 +72,36 @@ export const getEquipmentBySlug = async (slug: string) => {
   }
 };
 
+export const getFeaturedEquipments = async () => {
+  try {
+    const response = await httpClient.get(`/equipment?isFeatured=true`);
+    return response;
+  } catch (error: any) {
+    console.error("Error getting featured equipments:", error);
+    return [];
+  }
+};
+export const updateEquipment = async (id: string, data: any) => {
+  try {
+    const slug = data.name ? slugify(data.name, { lower: true, strict: true }) : undefined;
+    const response = await httpClient.patch(`/equipment/${id}`, { ...data, slug });
+    return response;
+  } catch (error: any) {
+    console.error("Error updating equipment:", error);
+    return { success: false, message: error.message || "Failed to update equipment" };
+  }
+};
+
+export const deleteEquipment = async (id: string) => {
+  try {
+    const response = await httpClient.delete(`/equipment/${id}`);
+    return response;
+  } catch (error: any) {
+    console.error("Error deleting equipment:", error);
+    return { success: false, message: error.message || "Failed to delete equipment" };
+  }
+};
+
 export const getTestimonials = async () => {
   try {
     const response = await httpClient.get(`/reviews/testimonial`);
