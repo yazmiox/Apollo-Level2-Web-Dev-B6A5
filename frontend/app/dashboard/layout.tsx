@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "../lib/auth-server";
 import SideNav from "./_components/SideNav";
+import { authClient } from "../lib/auth-client";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
@@ -10,6 +11,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   const user = session?.user
+
+  if (user?.emailVerified === false) {
+    await authClient.sendVerificationEmail({ email: user?.email! })
+    redirect("/verify-email")
+  }
+
   const role = user?.role || "user"
 
   return (

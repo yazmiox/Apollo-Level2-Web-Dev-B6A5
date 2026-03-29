@@ -21,6 +21,7 @@ export const auth = betterAuth({
     },
     emailAndPassword: {
         enabled: true,
+        requireEmailVerification: true,
         sendResetPassword: async ({ user, url, token }, request) => {
             console.log(url)
 
@@ -42,6 +43,8 @@ export const auth = betterAuth({
                 text: `Click the link to verify your email: ${verificationUrl}`
             })
         },
+        sendOnSignIn: true,
+        sendOnSignUp: true,
         autoSignInAfterVerification: true
     },
     trustedOrigins: [CLIENT_URL!],

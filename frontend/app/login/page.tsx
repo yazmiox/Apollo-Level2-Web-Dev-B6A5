@@ -30,8 +30,12 @@ export default function LoginPage() {
         setIsLoggingIn(false);
       },
       onError: (ctx) => {
-        setError(ctx.error.message);
-        setIsLoggingIn(false);
+        if (ctx.error.status === 403) {
+          router.push('/verify-email')
+        } else {
+          setError(ctx.error.message);
+          setIsLoggingIn(false);
+        }
       }
     })
   };

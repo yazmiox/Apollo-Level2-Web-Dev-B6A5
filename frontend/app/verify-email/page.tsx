@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { authClient } from "../lib/auth-client";
 
 export default function VerifyEmailPage() {
-  const { data, isPending } = authClient.useSession()
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -38,26 +37,6 @@ export default function VerifyEmailPage() {
     })
   };
 
-  const sendVerificationEmail = async () => {
-    console.log(data)
-    await authClient.sendVerificationEmail({
-      email: data?.user?.email!
-    }, {
-      onSuccess() {
-        toast.success("Verification email sent")
-      },
-      onError(ctx) {
-        toast.error(ctx.error.message)
-      }
-    })
-  };
-
-  const handleResendEmail = () => {
-    if (cooldown > 0) return;
-    sendVerificationEmail();
-    setCooldown(30);
-  };
-
   useEffect(() => {
     if (cooldown <= 0) return;
     const timer = setInterval(() => {
@@ -67,20 +46,10 @@ export default function VerifyEmailPage() {
   }, [cooldown]);
 
   useEffect(() => {
-    if (token && (!data?.session && !data?.user.emailVerified)) {
+    if (token) {
       verifyEmail();
     }
   }, []);
-
-  useEffect(() => {
-    if (data?.session) {
-      if (data?.user.emailVerified) {
-        router.push("/dashboard");
-      } else if (!token) {
-        sendVerificationEmail();
-      }
-    }
-  }, [isPending]);
 
   // Has token (Attempting verification / Verification successful)
   if (token) {
@@ -144,18 +113,7 @@ export default function VerifyEmailPage() {
               We&apos;ve sent a verification link to your inbox. <br className="hidden sm:block" />
               Please click the link to verify your account and get started.
             </p>
-
-            <div className="mt-8">
-              <button
-                onClick={handleResendEmail}
-                disabled={cooldown > 0}
-                className="flex w-full items-center justify-center rounded-[8px] bg-[#111] py-3.5 text-sm font-bold text-white transition-all hover:bg-[#333] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-[#888] disabled:hover:scale-100"
-              >
-                {cooldown > 0 ? `Resend available in ${cooldown}s` : "Resend Verification Email"}
-              </button>
-            </div>
-
-            <p className="mt-5 text-xs font-semibold italic text-[#aaa]">
+            <p className="text-xs font-semibold italic text-[#aaa]">
               Didn&apos;t receive the email? Check your spam folder or try resending.
             </p>
           </div>
