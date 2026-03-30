@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteEquipment } from "@/app/actions/equipment";
 import { Edit2, Loader2, Package, Plus, Search, Tags, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -67,6 +68,20 @@ export default function InventoryClient({ initialEquipments, initialCategories }
   );
 
   const handleDeleteEquipment = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this equipment?")) return;
+
+    const toastId = toast.loading("Deleting equipment...");
+    try {
+      const res = await deleteEquipment(id);
+      if (res.success) {
+        setEquipments(equipments.filter(e => e.id !== id));
+        toast.success("Equipment deleted", { id: toastId });
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete", { id: toastId });
+    }
   };
 
   const handleDeleteCategory = async (id: string) => {
