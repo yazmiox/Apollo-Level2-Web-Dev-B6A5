@@ -78,7 +78,7 @@ export default function AdminOverview({ stats }: { stats: any }) {
             </Link>
           </div>
           <div className="divide-y divide-[#f0ece5] flex-1">
-            {pendingRequests.map((req) => (
+            {pendingRequests.map((req: any) => (
               <div key={req.id} className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 gap-4">
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-bold text-[#111]">{req.equipment.name}</p>
@@ -134,17 +134,17 @@ export default function AdminOverview({ stats }: { stats: any }) {
             Quick Actions
           </h2>
           <div className="flex flex-col gap-3">
-            <Link href="/dashboard/inventory/new" className="group flex items-center justify-between rounded-xl border border-[#e0dbd3] bg-[#f9f8f6] p-4 hover:border-[#e8612e]/30 hover:bg-[#fdf5f2] transition-colors">
+            <Link href="/dashboard/inventory" className="group flex items-center justify-between rounded-xl border border-[#e0dbd3] bg-[#f9f8f6] p-4 hover:border-[#e8612e]/30 hover:bg-[#fdf5f2] transition-colors">
               <div>
-                <p className="text-sm font-bold text-[#111]">Add Equipment</p>
-                <p className="text-xs text-[#777]">List a new item for rent</p>
+                <p className="text-sm font-bold text-[#111]">Inventory</p>
+                <p className="text-xs text-[#777]">Manage your inventory</p>
               </div>
               <ArrowRight size={16} className="text-[#aaa] group-hover:text-[#e8612e] group-hover:translate-x-1 transition-all" />
             </Link>
-            <Link href="/dashboard/users/invite" className="group flex items-center justify-between rounded-xl border border-[#e0dbd3] bg-[#f9f8f6] p-4 hover:border-[#e8612e]/30 hover:bg-[#fdf5f2] transition-colors">
+            <Link href="/dashboard/users" className="group flex items-center justify-between rounded-xl border border-[#e0dbd3] bg-[#f9f8f6] p-4 hover:border-[#e8612e]/30 hover:bg-[#fdf5f2] transition-colors">
               <div>
-                <p className="text-sm font-bold text-[#111]">Invite User</p>
-                <p className="text-xs text-[#777]">Send a registration link</p>
+                <p className="text-sm font-bold text-[#111]">Customers</p>
+                <p className="text-xs text-[#777]">Manage your customers</p>
               </div>
               <ArrowRight size={16} className="text-[#aaa] group-hover:text-[#e8612e] group-hover:translate-x-1 transition-all" />
             </Link>
