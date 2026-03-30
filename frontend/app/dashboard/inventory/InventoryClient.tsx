@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteCategory } from "@/app/actions/category";
 import { deleteEquipment } from "@/app/actions/equipment";
 import { Edit2, Loader2, Package, Plus, Search, Tags, Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -98,6 +99,25 @@ export default function InventoryClient({ initialEquipments, initialCategories }
   };
 
   const handleDeleteCategory = async (id: string) => {
+    if (!confirm("Are you sure? This might affect items in this category.")) return;
+
+    setDeletingId(id);
+    const toastId = toast.loading("Deleting category...");
+
+    try {
+      const response = await deleteCategory(id);
+      if (response.success) {
+        setCategories(categories.filter((c) => c.id !== id));
+        toast.success("Category deleted successfully", { id: toastId });
+      } else {
+        throw new Error(response.message || "Failed to delete category");
+      }
+    } catch (err: any) {
+      console.error("Delete Error:", err);
+      toast.error(err.message || "Could not delete category", { id: toastId });
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const handleEquipmentSuccess = (updatedItem: Equipment) => {
