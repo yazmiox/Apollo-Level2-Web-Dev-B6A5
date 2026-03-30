@@ -1,4 +1,5 @@
 import { BookingStatus, EquipmentStatus } from "../../generated/prisma/enums";
+import { sendEmail } from "../../lib/mail";
 import prisma from "../../lib/prisma";
 import { getObjectUrl } from "../../lib/s3";
 import { ApiError } from "../../utils/ApiError";
@@ -160,6 +161,10 @@ export const createBooking = async (userId: string, data: CreateBookingInput) =>
 export const updateBookingStatus = async (id: string, nextStatus: BookingStatus, adminId?: string) => {
     const booking = await prisma.booking.findUnique({
         where: { id },
+        include: {
+            user: true,
+            equipment: true,
+        }
     });
 
     if (!booking) {
@@ -186,33 +191,16 @@ export const updateBookingStatus = async (id: string, nextStatus: BookingStatus,
 
         data.approvedByAdminId = adminId;
         data.approvedAt = new Date();
-    }
 
-    // We will send email here
+        await sendEmail({
+            to: booking.user.email,
+            subject: "Booking Approved",
+            text: `Your booking for ${booking.equipment?.name} has been approved. Please proceed to payment.`,
+        })
+    }
 
     return prisma.booking.update({
         where: { id },
         data,
-    });
-};
-
-export const confirmBookingAfterPayment = async (bookingId: string) => {
-    const booking = await prisma.booking.findUnique({
-        where: { id: bookingId },
-    });
-
-    if (!booking) {
-        throw new ApiError(404, "Booking not found");
-    }
-
-    if (booking.status !== BookingStatus.AWAITING_PAYMENT) {
-        throw new ApiError(400, "Booking is not awaiting payment");
-    }
-
-    return prisma.booking.update({
-        where: { id: bookingId },
-        data: {
-            status: BookingStatus.CONFIRMED,
-        },
     });
 };
