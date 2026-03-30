@@ -4,11 +4,13 @@ import { authClient } from "@/app/lib/auth-client";
 import { CalendarDays, FolderKanban, LayoutDashboard, LogOut, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 export default function SideNav({ role }: { role: string }) {
     const pathname = usePathname();
     const router = useRouter();
     const { data } = authClient.useSession();
+    const [isPending, startTransition] = useTransition();
     const user = data?.user;
     const initials = user?.name?.split(" ").map((n) => n[0]).join("").toUpperCase() || "EF";
 
@@ -25,12 +27,14 @@ export default function SideNav({ role }: { role: string }) {
     ];
 
     const signOut = async () => {
-        await authClient.signOut({
-            fetchOptions: {
-                onSuccess: () => {
-                    router.push("/login")
+        startTransition(async () => {
+            await authClient.signOut({
+                fetchOptions: {
+                    onSuccess: () => {
+                        router.push("/login")
+                    }
                 }
-            }
+            })
         })
     }
     return (
@@ -71,7 +75,7 @@ export default function SideNav({ role }: { role: string }) {
                 className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 transition-all text-left"
             >
                 <LogOut size={18} className="text-red-400 group-hover:text-red-500 transition-colors" />
-                Sign Out
+                {isPending ? "Signing out..." : "Sign Out"}
             </button>
         </nav>
     );
