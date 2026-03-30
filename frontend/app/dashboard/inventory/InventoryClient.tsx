@@ -4,6 +4,9 @@ import { deleteEquipment } from "@/app/actions/equipment";
 import { Edit2, Loader2, Package, Plus, Search, Tags, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { toast } from "sonner";
+import CategoryFormModal from "../_components/CategoryFormModal";
+import EquipmentFormModal from "../_components/EquipmentFormModal";
 
 const CONDITION_LABELS: Record<string, string> = {
   NEW: "New",
@@ -66,6 +69,16 @@ export default function InventoryClient({ initialEquipments, initialCategories }
   const filteredCategories = categories.filter(c =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleCategorySuccess = (updatedItem: Category) => {
+    setCategories((prev) => {
+      const index = prev.findIndex((c) => c.id === updatedItem.id);
+      if (index !== -1) {
+        return prev.map((c) => (c.id === updatedItem.id ? { ...c, ...updatedItem } : c));
+      }
+      return [...prev, updatedItem];
+    });
+  };
 
   const handleDeleteEquipment = async (id: string) => {
     if (!confirm("Are you sure you want to delete this equipment?")) return;
@@ -254,7 +267,11 @@ export default function InventoryClient({ initialEquipments, initialCategories }
 
       {/* ── Add/Edit Category Modal ── */}
       {(isCategoryModalOpen || editingCategory) && (
-        <div>Category modal</div>
+        <CategoryFormModal
+          initialData={editingCategory}
+          onSuccess={handleCategorySuccess}
+          onClose={() => { setIsCategoryModalOpen(false); setEditingCategory(null); }}
+        />
       )}
     </div>
   );
