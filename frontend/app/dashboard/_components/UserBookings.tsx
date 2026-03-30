@@ -1,12 +1,12 @@
 "use client";
 
-import { createCheckoutSession } from "@/app/actions/payment";
-import { createReview, updateReview } from "@/app/actions/review";
-import { ArrowRight, Calendar, Edit2, Loader2, MapPin, Star, Trash2, X } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import Image from "next/image";
+import { ArrowRight, Calendar, MapPin, Star, X, Edit2, Trash2, Loader2 } from "lucide-react";
+import { createReview, updateReview, deleteReview } from "@/app/actions/review";
+import { createCheckoutSession } from "@/app/actions/payment";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Review {
   id: string;
@@ -100,6 +100,18 @@ export default function UserBookings({ initialBookings }: { initialBookings: Boo
   };
 
   const handleDeleteReview = async (id: string) => {
+    if (!confirm("Are you sure you want to remove your review?")) return;
+
+    startTransition(async () => {
+      const res = await deleteReview(id);
+      if (res.success) {
+        toast.success("Review removed");
+        setReviewModalData(null);
+        router.refresh();
+      } else {
+        toast.error(res.message);
+      }
+    });
   };
 
   const handlePayment = async (bookingId: string) => {

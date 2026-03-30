@@ -22,3 +22,13 @@ export async function updateReview(id: string, data: { rating?: number; comment?
         return { success: false, message: error.message };
     }
 }
+
+export async function deleteReview(id: string) {
+    try {
+        const response = await httpClient.delete(`/reviews/${id}`);
+        revalidatePath("/dashboard/bookings");
+        return response;
+    } catch (error: any) {
+        return { success: false, message: error.message };
+    }
+}
