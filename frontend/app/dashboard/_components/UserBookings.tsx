@@ -1,9 +1,11 @@
 "use client";
 
+import { createCheckoutSession } from "@/app/actions/payment";
 import { ArrowRight, Calendar, Edit2, Loader2, MapPin, Star, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 
 interface Review {
   id: string;
@@ -81,6 +83,19 @@ export default function UserBookings({ initialBookings }: { initialBookings: Boo
   };
 
   const handlePayment = async (bookingId: string) => {
+    setPaymentLoading(bookingId);
+    try {
+      const res = await createCheckoutSession(bookingId);
+      if (res.success && res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        toast.error(res.message || "Failed to initialize payment");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setPaymentLoading(null);
+    }
   };
 
   return (
