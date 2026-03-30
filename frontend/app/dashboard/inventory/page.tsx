@@ -1,8 +1,12 @@
+import { getAllCategories } from "@/app/actions/category";
+import { getAllEquipments } from "@/app/actions/equipment";
 import InventoryClient from "./InventoryClient";
 
 export default async function AdminInventoryPage() {
-  const categoriesRes = { success: true, data: [] }
-  const equipmentsRes = { success: true, data: [] }
+  const [categoriesRes, equipmentsRes] = await Promise.all([
+    getAllCategories(),
+    getAllEquipments()
+  ]);
 
   const categories = categoriesRes?.success && Array.isArray(categoriesRes.data)
     ? categoriesRes.data

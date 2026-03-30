@@ -72,6 +72,20 @@ export default function InventoryClient({ initialEquipments, initialCategories }
   const handleDeleteCategory = async (id: string) => {
   };
 
+  const handleEquipmentSuccess = (updatedItem: Equipment) => {
+    setEquipments((prev) => {
+      const index = prev.findIndex((e) => e.id === updatedItem.id);
+      if (index !== -1) {
+        // Update existing item
+        const newEquipments = [...prev];
+        newEquipments[index] = { ...newEquipments[index], ...updatedItem };
+        return newEquipments;
+      }
+      // Add new item to the beginning
+      return [updatedItem, ...prev];
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -215,7 +229,12 @@ export default function InventoryClient({ initialEquipments, initialCategories }
 
       {/* ── Add/Edit Equipment Modal ── */}
       {(isEquipModalOpen || editingEquipment) && (
-        <div>Equipment modal</div>
+        <EquipmentFormModal
+          initialData={editingEquipment}
+          onSuccess={handleEquipmentSuccess}
+          onClose={() => { setIsEquipModalOpen(false); setEditingEquipment(null); }}
+          categories={categories}
+        />
       )}
 
       {/* ── Add/Edit Category Modal ── */}
