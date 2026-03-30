@@ -1,6 +1,7 @@
 "use client";
 
 import { createCheckoutSession } from "@/app/actions/payment";
+import { createReview, updateReview } from "@/app/actions/review";
 import { ArrowRight, Calendar, Edit2, Loader2, MapPin, Star, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -77,6 +78,25 @@ export default function UserBookings({ initialBookings }: { initialBookings: Boo
   };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewModalData) return;
+
+    startTransition(async () => {
+      let res;
+      if (reviewModalData.review) {
+        res = await updateReview(reviewModalData.review.id, { rating, comment });
+      } else {
+        res = await createReview({ bookingId: reviewModalData.id, rating, comment });
+      }
+
+      if (res.success) {
+        toast.success(res.message || "Review status updated");
+        setReviewModalData(null);
+        router.refresh();
+      } else {
+        toast.error(res.message || "Something went wrong");
+      }
+    });
   };
 
   const handleDeleteReview = async (id: string) => {
