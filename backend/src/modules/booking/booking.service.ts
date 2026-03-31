@@ -1,3 +1,4 @@
+import { waitUntil } from "@vercel/functions";
 import { BookingStatus, EquipmentStatus } from "../../generated/prisma/enums";
 import { sendEmail } from "../../lib/mail";
 import prisma from "../../lib/prisma";
@@ -208,11 +209,15 @@ export const updateBookingStatus = async (id: string, nextStatus: BookingStatus,
         data.approvedByAdminId = adminId;
         data.approvedAt = new Date();
 
-        await sendEmail({
-            to: booking.user.email,
-            subject: "Booking Approved",
-            text: `Your booking for ${booking.equipment?.name} has been approved. Please proceed to payment.`,
-        })
+        waitUntil(
+            sendEmail({
+                to: booking.user.email,
+                subject: "Booking Approved",
+                text: `Your booking for ${booking.equipment?.name} has been approved. Please proceed to payment.`,
+            }).catch(err => {
+                console.error("Failed to send approval email:", err);
+            })
+        );
     }
 
     return prisma.booking.update({

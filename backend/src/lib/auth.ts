@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./prisma";
 import { CLIENT_URL } from "./env";
 import { sendEmail } from "./mail";
+import { waitUntil } from "@vercel/functions";
 
 
 export const auth = betterAuth({
@@ -25,11 +26,13 @@ export const auth = betterAuth({
         sendResetPassword: async ({ user, url, token }, request) => {
             console.log(url)
 
-            void sendEmail({
-                to: user.email,
-                subject: "Reset your password",
-                text: `Click the link to reset your password: ${url}`
-            })
+            waitUntil(
+                sendEmail({
+                    to: user.email,
+                    subject: "Reset your password",
+                    text: `Click the link to reset your password: ${url}`
+                })
+            )
         }
     },
     emailVerification: {
@@ -37,11 +40,13 @@ export const auth = betterAuth({
             const verificationUrl = `${CLIENT_URL}/verify-email?token=${token}`
             console.log(verificationUrl)
 
-            void sendEmail({
-                to: user.email,
-                subject: "Verify your email",
-                text: `Click the link to verify your email: ${verificationUrl}`
-            })
+            waitUntil(
+                sendEmail({
+                    to: user.email,
+                    subject: "Verify your email",
+                    text: `Click the link to verify your email: ${verificationUrl}`
+                })
+            )
         },
         sendOnSignIn: true,
         sendOnSignUp: true,
