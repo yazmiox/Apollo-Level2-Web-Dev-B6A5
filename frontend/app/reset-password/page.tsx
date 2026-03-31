@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "../lib/auth-client";
+import Spinner from "../components/Spinner";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -21,7 +22,6 @@ function ResetPasswordForm() {
 
   // If token is invalid/expired
   if (!token || errorToken) {
-    console.log("Invalid or expired token")
     return (
 
       <div className="flex min-h-screen flex-col bg-[#f4f1ed]">
@@ -191,13 +191,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#f4f1ed]">
-          <Loader2 size={32} className="animate-spin text-[#e8612e]" />
-        </div>
-      }
-    >
+    <Suspense fallback={<Spinner />}>
       <ResetPasswordForm />
     </Suspense>
   );

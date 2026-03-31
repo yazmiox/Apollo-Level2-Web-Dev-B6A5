@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "../lib/auth-client";
+import Spinner from "../components/Spinner";
 
 function VerifyEmailPage() {
   const router = useRouter();
@@ -29,7 +30,6 @@ function VerifyEmailPage() {
       onSuccess() {
         setIsVerifyingEmail(false)
         router.push("/dashboard");
-        // startTimer()
       },
       onError(ctx) {
         toast.error(ctx.error.message)
@@ -125,13 +125,7 @@ function VerifyEmailPage() {
 
 export default function VerifyEmail() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#f4f1ed]">
-          <Loader2 size={32} className="animate-spin text-[#e8612e]" />
-        </div>
-      }
-    >
+    <Suspense fallback={<Spinner />}>
       <VerifyEmailPage />
     </Suspense>
   )

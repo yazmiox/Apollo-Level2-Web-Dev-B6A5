@@ -7,6 +7,7 @@ import { createReview, updateReview, deleteReview } from "@/app/actions/review";
 import { createCheckoutSession } from "@/app/actions/payment";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Equipment } from "@/app/types";
 
 interface Review {
   id: string;
@@ -20,11 +21,7 @@ interface Booking {
   endDate: string;
   amount: number;
   status: string;
-  equipment: {
-    name: string;
-    imageKey: string;
-    location: string;
-  };
+  equipment: Equipment;
   review?: Review;
 }
 
@@ -169,7 +166,7 @@ export default function UserBookings({ initialBookings }: { initialBookings: Boo
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-5">
                 <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl bg-[#f4f1ed] sm:w-32">
-                  <Image src={booking.equipment.imageUrl} alt={booking.equipment.name} fill className="object-cover" />
+                  <Image src={booking.equipment.imageUrl!} alt={booking.equipment.name} fill className="object-cover" />
                 </div>
 
                 <div className="flex flex-1 flex-col gap-2">
