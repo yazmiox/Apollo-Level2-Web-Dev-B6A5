@@ -84,11 +84,3 @@ export const handleStripeWebhook = async (req: Request) => {
     }
     return event
 }
-
-export const getMyPayments = async () => {
-
-}
-
-export const getPaymentByBooking = async () => {
-
-}

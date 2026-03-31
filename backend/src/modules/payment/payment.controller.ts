@@ -21,11 +21,3 @@ export const handleStripeWebhook = async (req: Request, res: Response, next: Nex
         next(error)
     }
 }
-
-export const getMyPayments = (req: Request, res: Response, next: NextFunction) => {
-
-}
-
-export const getPaymentByBooking = (req: Request, res: Response) => {
-
-}

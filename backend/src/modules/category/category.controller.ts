@@ -15,9 +15,6 @@ export const getCategory = async (req: Request, res: Response, next: NextFunctio
     try {
         const { slug } = req.params;
         const category = await categoryService.getCategoryBySlug(slug as string);
-        if (!category) {
-            return res.status(404).json({ status: "error", message: "Category not found" });
-        }
         res.status(200).json({ success: true, data: category });
     } catch (error) {
         next(error);
@@ -26,7 +23,6 @@ export const getCategory = async (req: Request, res: Response, next: NextFunctio
 
 export const createCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // You should validate input data and handle roles here (e.g., admin check)
         const category = await categoryService.createCategory(req.body);
         res.status(201).json({ success: true, data: category });
     } catch (error) {

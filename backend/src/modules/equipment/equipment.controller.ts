@@ -26,9 +26,6 @@ export const getEquipment = async (req: Request, res: Response, next: NextFuncti
     try {
         const { slug } = req.params;
         const equipment = await equipmentService.getEquipmentBySlug(slug as string);
-        if (!equipment) {
-            throw new ApiError(404, "Equipment not found");
-        }
         res.status(200).json({ success: true, data: equipment });
     } catch (error) {
         next(error);

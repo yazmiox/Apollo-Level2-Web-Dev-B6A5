@@ -16,6 +16,9 @@ export const getAllCategories = async (q?: string) => {
 
 export const getCategoryBySlug = async (slug: string) => {
     const category = await prisma.category.findUnique({ where: { slug } });
+    if (!category) {
+        throw new ApiError(404, "Category not found");
+    }
     return category;
 }
 
