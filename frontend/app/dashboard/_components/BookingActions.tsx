@@ -4,25 +4,28 @@ import { Check, X, Loader2, RotateCcw, PackageOpen } from "lucide-react";
 import { updateBookingStatus } from "../../actions/booking";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface BookingActionsProps {
     role: string;
     bookingId: string;
     currentStatus: string;
-    onStatusUpdate: (id: string, status: string) => void;
 }
 
-export default function BookingActions({ role, bookingId, currentStatus, onStatusUpdate }: BookingActionsProps) {
+export default function BookingActions({ role, bookingId, currentStatus }: BookingActionsProps) {
     const [isLoading, setIsLoading] = useState<string | null>(null);
+    const router = useRouter();
 
     const handleBookingStatusChange = async (status: string) => {
         setIsLoading(status);
         try {
-            await updateBookingStatus(bookingId, status);
-            onStatusUpdate(bookingId, status);
+            const response = await updateBookingStatus(bookingId, status);
+            if (!response.success) throw new Error(response.message || "Failed to update booking status");
+
             toast.success(`Booking status updated to ${status.replace(/_/g, " ").toLowerCase()}`);
-        } catch (error) {
-            toast.error("Failed to update booking status");
+            router.refresh();
+        } catch (error: any) {
+            toast.error(error.message || "Failed to update booking status");
             console.error(error);
         } finally {
             setIsLoading(null);

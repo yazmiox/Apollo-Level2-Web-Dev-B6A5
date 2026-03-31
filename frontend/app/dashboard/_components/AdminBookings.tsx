@@ -1,31 +1,11 @@
-"use client";
-
 import { formatDateShort } from "@/app/utils";
-import { Calendar, ChevronRight, Search } from "lucide-react";
+import { Calendar, ChevronRight } from "lucide-react";
+import { Booking } from "@/app/types";
 import Image from "next/image";
-import { useState } from "react";
 import BookingActions from "./BookingActions";
+import SearchBox from "./SearchBox";
 
-export default function AdminBookings({ initialBookings }: { initialBookings: any[] }) {
-  const [bookings, setBookings] = useState(initialBookings)
-  const [filter, setFilter] = useState("ALL");
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredBookings = bookings?.filter(b => {
-    const matchesFilter = filter === "ALL" ? true : b.status === filter;
-    const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = b.user.name.toLowerCase().includes(searchLower) ||
-      b.user.email.toLowerCase().includes(searchLower) ||
-      b.equipment.name.toLowerCase().includes(searchLower);
-    return matchesFilter && matchesSearch;
-  });
-
-  const handleStatusUpdate = (bookingId: string, newStatus: string) => {
-    setBookings(prev => prev.map(booking =>
-      booking.id === bookingId ? { ...booking, status: newStatus } : booking
-    ));
-  };
-
+export default function AdminBookings({ initialBookings }: { initialBookings: Booking[] }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "PENDING_APPROVAL":
@@ -59,22 +39,6 @@ export default function AdminBookings({ initialBookings }: { initialBookings: an
             Review, approve, or reject incoming rental requests.
           </p>
         </div>
-
-        <div className="flex items-center gap-1 rounded-[8px] bg-[#f9f8f6] p-1 border border-[#e0dbd3]">
-          {["ALL", "PENDING_APPROVAL", "AWAITING_PAYMENT", "ACTIVE"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`whitespace-nowrap rounded-[6px] px-4 py-2 text-[13px] font-semibold transition-all ${filter === f ? "bg-white text-[#111] shadow-sm border border-[#e0dbd3]" : "text-[#777] hover:text-[#111]"
-                }`}
-            >
-              {f === "ALL" ? "All Bookings"
-                : f === "PENDING_APPROVAL" ? "Needs Review"
-                  : f === "AWAITING_PAYMENT" ? "Awaiting Deposit"
-                    : "Active"}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Main Table Container */}
@@ -82,16 +46,7 @@ export default function AdminBookings({ initialBookings }: { initialBookings: an
 
         {/* Toolbar row */}
         <div className="border-b border-[#f0ece5] p-4 bg-[#f9f8f6] flex items-center justify-between">
-          <div className="relative max-w-sm flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aaa]" size={16} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by customer name, email, or item..."
-              className="w-full rounded-[8px] border border-[#e0dbd3] bg-white px-4 py-2 pl-9 text-[13px] text-[#111] placeholder:text-[#aaa] outline-none transition-all focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]/30"
-            />
-          </div>
+          <SearchBox placeholder="Search by customer, email, or item..." />
         </div>
 
         {/* Table itself */}
@@ -108,18 +63,14 @@ export default function AdminBookings({ initialBookings }: { initialBookings: an
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f0ece5] text-[13px] text-[#444]">
-              {filteredBookings.length === 0 ? (
+              {initialBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-24 text-center">
-                    <div className="flex flex-col items-center justify-center opacity-60">
-                      <Search size={32} className="mb-3 text-[#aaa]" />
-                      <p className="text-sm font-semibold text-[#555]">No bookings found.</p>
-                      <p className="text-xs text-[#888] mt-1">Try adjusting your filters or search query.</p>
-                    </div>
+                  <td colSpan={6} className="py-24 text-center">
+                    <p className="text-sm font-semibold text-[#555]">No bookings found.</p>
                   </td>
                 </tr>
               ) : (
-                filteredBookings.map((req) => (
+                initialBookings.map((req) => (
                   <tr key={req.id} className="hover:bg-[#f9f8f6] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
@@ -130,14 +81,16 @@ export default function AdminBookings({ initialBookings }: { initialBookings: an
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-[6px] border border-[#e0dbd3] bg-[#f4f1ed]">
-                          <Image src={req.equipment.imageUrl} alt={req.equipment.name} fill className="object-cover" />
+                          {req.equipment.imageUrl && (
+                            <Image src={req.equipment.imageUrl} alt={req.equipment.name} fill className="object-cover" />
+                          )}
                         </div>
                         <span className="font-semibold text-[#111]">{req.equipment.name}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5 text-[#555] font-medium">
-                        <Calendar size={13} className="text-[#aaa]" />
+                        <Calendar className="text-[#aaa]" size={13} />
                         {formatDateShort(req.startDate)} <ChevronRight size={12} className="text-[#ccc] mx-0.5" /> {formatDateShort(req.endDate)}
                       </div>
                     </td>
@@ -148,7 +101,7 @@ export default function AdminBookings({ initialBookings }: { initialBookings: an
                       {getStatusBadge(req.status)}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <BookingActions role={req.user.role} bookingId={req.id} currentStatus={req.status} onStatusUpdate={handleStatusUpdate} />
+                      <BookingActions role={req.user.role} bookingId={req.id} currentStatus={req.status} />
                     </td>
                   </tr>
                 ))

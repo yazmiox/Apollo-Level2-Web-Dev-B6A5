@@ -59,3 +59,22 @@ export interface CustomerStats {
     totalRentals: number;
     joined: string;
 }
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+}
+
+export interface Booking {
+    id: string;
+    startDate: string;
+    endDate: string;
+    amount: number;
+    status: string;
+    user: User;
+    equipment: Equipment & { imageUrl?: string | null };
+    payment?: any;
+    review?: any;
+}
