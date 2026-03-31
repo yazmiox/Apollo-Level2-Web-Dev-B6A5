@@ -2,6 +2,7 @@
 
 import slugify from "slugify";
 import httpClient from "../lib/httpClient";
+import { Category } from "../types";
 
 type CreateCategoryInput = {
     name: string;
@@ -20,8 +21,9 @@ export const createCategory = async (data: CreateCategoryInput) => {
     return response;
 }
 
-export const getAllCategories = async () => {
-    const response = await httpClient.get("/categories");
+export const getAllCategories = async (q?: string) => {
+    const url = q ? `/categories?q=${q}` : "/categories";
+    const response = await httpClient.get<Category[]>(url);
     return response;
 }
 
