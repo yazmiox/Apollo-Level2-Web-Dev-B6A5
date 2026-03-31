@@ -4,7 +4,11 @@ import { Search, Loader2 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTransition, useEffect, useState } from "react";
 
-export default function SearchBox() {
+interface SearchBoxProps {
+  placeholder?: string;
+}
+
+export default function SearchBox({ placeholder = "Search..." }: SearchBoxProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -24,6 +28,8 @@ export default function SearchBox() {
       } else {
         params.delete("q");
       }
+      // Reset page to 1 on new search
+      params.delete("page");
 
       startTransition(() => {
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
@@ -46,7 +52,7 @@ export default function SearchBox() {
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Search customers by name or email..."
+        placeholder={placeholder}
         className="w-full rounded-[8px] border border-[#e0dbd3] bg-white px-4 py-2 pl-9 text-sm text-[#111] outline-none transition-all focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]/30"
       />
     </div>
