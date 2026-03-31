@@ -3,7 +3,8 @@ import * as categoryService from "./category.service";
 
 export const getAllCategories = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const categories = await categoryService.getAllCategories();
+        const { q } = req.query;
+        const categories = await categoryService.getAllCategories(q as string);
         res.status(200).json({ success: true, data: categories });
     } catch (error) {
         next(error);

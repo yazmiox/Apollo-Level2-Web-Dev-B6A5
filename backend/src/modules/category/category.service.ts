@@ -2,8 +2,15 @@ import prisma from "../../lib/prisma";
 import { ApiError } from "../../utils/ApiError";
 import { CreateCategoryInput, UpdateCategoryInput } from "./category.schema";
 
-export const getAllCategories = async () => {
-    const categories = await prisma.category.findMany();
+export const getAllCategories = async (q?: string) => {
+    const categories = await prisma.category.findMany({
+        where: q ? {
+            OR: [
+                { name: { contains: q, mode: "insensitive" } },
+                { description: { contains: q, mode: "insensitive" } },
+            ]
+        } : {}
+    });
     return categories;
 }
 
