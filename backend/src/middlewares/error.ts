@@ -16,7 +16,7 @@ export const globalErrorHandler = (error: Error | ApiError | ZodError, req: Requ
     } else if (error instanceof ZodError) {
 
         statusCode = 400
-        message = "Validation failed. Please check your input."
+        message = "Input validation failed. Please check your input."
         validationErrors = flattenError(error).fieldErrors
 
     } else if (error instanceof Prisma.PrismaClientUnknownRequestError ||
@@ -31,6 +31,7 @@ export const globalErrorHandler = (error: Error | ApiError | ZodError, req: Requ
     console.log(error);
     res.status(statusCode).json({
         success: false,
+        data: null,
         message: message,
         ...(validationErrors && { validationErrors })
     })
