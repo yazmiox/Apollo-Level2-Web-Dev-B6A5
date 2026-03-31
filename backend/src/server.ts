@@ -7,7 +7,7 @@ import categoryRoutes from "./modules/category/category.routes";
 import equipmentRoutes from "./modules/equipment/equipment.routes";
 import bookingRoutes from "./modules/booking/booking.routes";
 import paymentRoutes from "./modules/payment/payment.routes";
-import { globalErrorHandler } from "./lib/error";
+import { globalErrorHandler } from "./middlewares/error";
 import { authenticate } from "./middlewares/auth";
 import { handleStripeWebhook } from "./modules/payment/payment.controller";
 import statsRoutes from "./modules/stats/stats.routes";
