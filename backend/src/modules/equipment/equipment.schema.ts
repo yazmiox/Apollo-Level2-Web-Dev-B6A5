@@ -18,19 +18,28 @@ export const createEquipmentSchema = z.object({
         error: "Category ID is required",
     }),
 
-    brand: z.string(),
-    modelName: z.string(),
-    location: z.string(),
+    brand: z.string({
+        error: "Brand is required",
+    }).min(2, "Brand must be at least 2 characters"),
+    modelName: z.string({
+        error: "Model name is required",
+    }).min(2, "Model name must be at least 2 characters"),
+    location: z.string({
+        error: "Location is required",
+    }).min(2, "Location must be at least 2 characters"),
     imageKey: z.string("Invalid image URL"),
     condition: z.enum(EquipmentCondition).default("GOOD"),
     status: z.enum(EquipmentStatus).default("AVAILABLE"),
     rentalRate: z.number({
         error: "Rental rate is required",
     }).positive("Rental rate must be positive"),
-    includedItems: z.array(z.string()),
-    specifications: z.json(),
+    includedItems: z.array(z.string()).min(1, "Included items are required"),
+    specifications: z.record(z.string(), z.any()).refine(
+        (data) => Object.keys(data).length > 0,
+        "Specifications must contain at least one property"
+    ),
     isFeatured: z.boolean().default(false),
-});
+})
 
 export const updateEquipmentSchema = createEquipmentSchema.partial();
 
