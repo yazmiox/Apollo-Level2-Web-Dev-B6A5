@@ -14,10 +14,7 @@ export default async function AdminCategoriesPage({
   const searchQuery = params.q || "";
 
   const categoriesRes = await getAllCategories(searchQuery);
-
-  const categories = categoriesRes?.success && Array.isArray(categoriesRes.data)
-    ? categoriesRes.data
-    : [];
+  const categories = categoriesRes.data || [];
 
   return (
     <div className="space-y-6">

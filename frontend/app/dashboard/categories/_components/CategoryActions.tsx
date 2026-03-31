@@ -5,13 +5,10 @@ import { Edit2, Loader2, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import CategoryFormModal from "../../_components/CategoryFormModal";
+import CategoryFormModal from "./CategoryFormModal";
+import { Category } from "@/app/types";
 
-interface CategoryActionsProps {
-  category: any;
-}
-
-export default function CategoryActions({ category }: CategoryActionsProps) {
+export default function CategoryActions({ category }: { category: Category }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
@@ -23,13 +20,13 @@ export default function CategoryActions({ category }: CategoryActionsProps) {
     const toastId = toast.loading("Deleting category...");
 
     try {
+
       const response = await deleteCategory(id);
-      if (response.success) {
-        toast.success("Category deleted successfully", { id: toastId });
-        router.refresh();
-      } else {
-        throw new Error(response.message || "Failed to delete category");
-      }
+      if (!response.success) throw new Error(response.message || "Failed to delete category");
+
+      toast.success("Category deleted successfully", { id: toastId });
+      router.refresh();
+
     } catch (err: any) {
       console.error("Delete Error:", err);
       toast.error(err.message || "Could not delete category", { id: toastId });
@@ -41,9 +38,9 @@ export default function CategoryActions({ category }: CategoryActionsProps) {
   return (
     <>
       <div className="flex items-center justify-end gap-2 opacity-0 focus-within:opacity-100 group-hover:opacity-100 transition-opacity">
-        <button 
-          onClick={() => setIsEditing(true)} 
-          title="Edit" 
+        <button
+          onClick={() => setIsEditing(true)}
+          title="Edit"
           className="flex items-center gap-1 rounded-md border border-stone-200 bg-white p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-50 transition-colors"
         >
           <Edit2 size={16} /> Edit

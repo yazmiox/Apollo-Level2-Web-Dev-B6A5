@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import CategoryFormModal from "../../_components/CategoryFormModal";
+import CategoryFormModal from "./CategoryFormModal";
 
 export default function CategoryAddAction() {
   const [isOpen, setIsOpen] = useState(false);

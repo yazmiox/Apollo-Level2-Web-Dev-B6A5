@@ -7,7 +7,7 @@ import { createCategory, updateCategory } from "@/app/actions/category";
 
 interface CategoryFormModalProps {
   onClose: () => void;
-  onSuccess: (category: any) => void;
+  onSuccess: () => void;
   initialData?: any;
 }
 
@@ -24,23 +24,24 @@ export default function CategoryFormModal({ onClose, onSuccess, initialData }: C
     };
 
     const toastId = toast.loading(isEditMode ? "Updating category..." : "Creating category...");
-    
+
     try {
       setIsSubmitting(true);
-      const res = isEditMode 
+      const res = isEditMode
         ? await updateCategory(initialData.id, data)
         : await createCategory(data);
 
       if (!res.success) throw new Error(res.message || "Something went wrong");
 
       toast.success(isEditMode ? "Category updated!" : "Category created!", { id: toastId });
-      onSuccess(res.data);
+      onSuccess();
       onClose();
+
     } catch (err: any) {
       console.error("Category Error:", err);
-      toast.error(isEditMode ? "Update failed" : "Creation failed", { 
-        id: toastId, 
-        description: err.message 
+      toast.error(isEditMode ? "Update failed" : "Creation failed", {
+        id: toastId,
+        description: err.message
       });
     } finally {
       setIsSubmitting(false);
@@ -74,38 +75,38 @@ export default function CategoryFormModal({ onClose, onSuccess, initialData }: C
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#777]">Category Name</label>
-            <input 
-              name="name" 
-              defaultValue={initialData?.name} 
-              type="text" 
-              required 
-              placeholder="e.g. Audio, Drones" 
-              className="rounded-[7px] border border-[#e0dbd3] px-3 py-2 text-sm text-[#111] outline-none focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e] transition-all" 
+            <input
+              name="name"
+              defaultValue={initialData?.name}
+              type="text"
+              required
+              placeholder="e.g. Audio, Drones"
+              className="rounded-[7px] border border-[#e0dbd3] px-3 py-2 text-sm text-[#111] outline-none focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e] transition-all"
             />
           </div>
-          
+
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#777]">Description</label>
-            <textarea 
-              name="description" 
-              defaultValue={initialData?.description} 
-              rows={3} 
-              placeholder="Brief description of this category..." 
+            <textarea
+              name="description"
+              defaultValue={initialData?.description}
+              rows={3}
+              placeholder="Brief description of this category..."
               className="rounded-[7px] border border-[#e0dbd3] px-3 py-2 text-sm text-[#111] outline-none focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e] transition-all"
             ></textarea>
           </div>
 
           <div className="pt-4 flex gap-3">
-            <button 
-              type="button" 
-              onClick={onClose} 
+            <button
+              type="button"
+              onClick={onClose}
               className="flex-1 rounded-[8px] border border-[#e0dbd3] bg-white py-2.5 text-sm font-bold text-[#555] hover:bg-[#f9f8f6] transition-all"
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
-              disabled={isSubmitting} 
+            <button
+              type="submit"
+              disabled={isSubmitting}
               className="flex-[2] rounded-[8px] bg-[#111] py-2.5 text-sm font-bold text-white hover:bg-[#333] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isSubmitting ? (

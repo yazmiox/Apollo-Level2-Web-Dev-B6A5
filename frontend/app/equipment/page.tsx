@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { getAllCategories } from "../actions/equipment";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import EquipmentFilters from "./_components/EquipmentFilters";
 import EquipmentList from "./_components/EquipmentList";
 import EquipmentListSkeleton from "./_components/EquipmentListSkeleton";
+import { getAllCategories } from "../actions/category";
 
 export default async function EquipmentPage({
   searchParams,
@@ -12,7 +12,8 @@ export default async function EquipmentPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams
-  const categories = await getAllCategories();
+  const categoryRes = await getAllCategories();
+  const categories = categoryRes.data || [];
   return (
     <>
       <Navbar />
