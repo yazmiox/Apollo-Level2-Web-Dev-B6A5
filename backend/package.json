@@ -2,12 +2,12 @@
   "name": "equipflow-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "check": "tsc --noEmit",
     "build": "tsup src/server.ts --format esm --clean",
-    "start": "node .",
+    "start": "node dist/server.js",
     "db:gen": "prisma generate",
     "db:push": "prisma generate && prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -42,6 +42,7 @@
     "nodemailer": "^8.0.3",
     "pg": "^8.20.0",
     "stripe": "^20.4.1",
+    "tsup": "^8.5.1",
     "zod": "^4.3.6"
   }
 }
