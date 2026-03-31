@@ -10,12 +10,13 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const stats = await getStats();
+  const statsRes = await getStats();
+  const stats = statsRes.data!;
   const user = session.user;
 
   if (user.role === "admin") {
     return <AdminOverview stats={stats} />;
   }
 
-  return <UserOverview stats={stats} userName={user.name || "User"} />;
+  return <UserOverview stats={stats} username={user.name!} />;
 }

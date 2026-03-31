@@ -78,3 +78,12 @@ export interface Booking {
     payment?: any;
     review?: any;
 }
+
+export interface UserStats {
+    pendingApprovals: number;
+    activeRentals: number;
+    pendingPayments: number;
+    totalBookings: number;
+    latestApprovedBookingName: string | null;
+    totalSpent: string;
+}

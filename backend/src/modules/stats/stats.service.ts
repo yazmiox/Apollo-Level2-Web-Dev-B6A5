@@ -5,7 +5,10 @@ export const getStats = async (role: string, userId?: string) => {
         const [
             totalSpentData,
             activeRentals,
-            pendingApprovals
+            pendingApprovals,
+            pendingPayments,
+            totalBookings,
+            latestApprovedBooking
         ] = await Promise.all([
             prisma.payment.aggregate({
                 where: {
@@ -29,12 +32,40 @@ export const getStats = async (role: string, userId?: string) => {
                     userId,
                     status: "PENDING_APPROVAL"
                 }
+            }),
+            prisma.booking.count({
+                where: {
+                    userId,
+                    status: "AWAITING_PAYMENT"
+                }
+            }),
+            prisma.booking.count({
+                where: {
+                    userId
+                }
+            }),
+            prisma.booking.findFirst({
+                where: {
+                    userId,
+                    status: "AWAITING_PAYMENT"
+                },
+                include: {
+                    equipment: {
+                        select: { name: true }
+                    }
+                },
+                orderBy: {
+                    updatedAt: "desc"
+                }
             })
         ]);
 
         return {
             pendingApprovals,
             activeRentals,
+            pendingPayments,
+            totalBookings,
+            latestApprovedBookingName: latestApprovedBooking?.equipment?.name || null,
             totalSpent: `$${Number(totalSpentData._sum.amount || 0).toLocaleString()}`,
         };
     }
