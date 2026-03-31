@@ -2,112 +2,62 @@
 
 import slugify from "slugify";
 import httpClient from "../lib/httpClient";
+import { Equipment, EquipmentSearchParams } from "../types";
 
 export const getUploadUrl = async (data: { fileName: string; contentType: string; size: number }) => {
-  try {
-    const response = await httpClient.post(`/equipment/upload-url`, data);
-    return response;
-  } catch (error: any) {
-    console.error("Error getting upload URL:", error);
-    return { success: false, message: error.message || "Failed to get upload URL" };
-  }
+  const response = await httpClient.post<{ uploadUrl: string; key: string }>(`/equipment/upload-url`, data);
+  return response;
 };
 
 export const createEquipment = async (data: any) => {
-  try {
-    const slug = slugify(data.name, {
-      lower: true,
-      strict: true,
-    });
+  const slug = slugify(data.name, {
+    lower: true,
+    strict: true,
+  });
 
-    const response = await httpClient.post(`/equipment`, {
-      ...data,
-      slug,
-    });
-    return response;
-  } catch (error: any) {
-    console.error("Error creating equipment:", error);
-    return { success: false, message: error.message || "Failed to create equipment" };
-  }
+  const response = await httpClient.post<Equipment>(`/equipment`, {
+    ...data,
+    slug,
+  });
+  return response;
 };
 
-export const getAllEquipments = async (params: any = {}) => {
-  try {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value) searchParams.append(key, String(value));
-    });
+export const getAllEquipments = async (params: EquipmentSearchParams = {}) => {
+  const searchParams = new URLSearchParams();
 
-    const queryString = searchParams.toString();
-    const url = `/equipment${queryString ? `?${queryString}` : ""}`;
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) searchParams.append(key, String(value));
+  });
 
-    const response = await httpClient.get(url);
-    if (response.success) {
-      return response;
-    }
-    return { success: false, data: [], metadata: { total: 0, page: 1, limit: 9, totalPages: 0 } };
-  } catch (error: any) {
-    console.error("Error getting equipments:", error);
-    return { success: false, data: [], metadata: { total: 0, page: 1, limit: 9, totalPages: 0 } };
-  }
-};
+  const queryString = searchParams.toString();
+  const url = `/equipment${queryString ? `?${queryString}` : ""}`;
 
-export const getAllCategories = async () => {
-  try {
-    const response = await httpClient.get(`/categories`);
-    return response.success ? response.data : [];
-  } catch (error: any) {
-    console.error("Error getting categories:", error);
-    return [];
-  }
+  const response = await httpClient.get<Equipment[]>(url);
+  return response;
 };
 
 export const getEquipmentBySlug = async (slug: string) => {
-  try {
-    const response = await httpClient.get(`/equipment/${slug}`);
-    return response;
-  } catch (error: any) {
-    console.error("Error getting equipment by slug:", error);
-    return null;
-  }
+  const response = await httpClient.get(`/equipment/${slug}`);
+  return response;
 };
 
 export const getFeaturedEquipments = async () => {
-  try {
-    const response = await httpClient.get(`/equipment?isFeatured=true`);
-    return response;
-  } catch (error: any) {
-    console.error("Error getting featured equipments:", error);
-    return [];
-  }
+  const response = await httpClient.get(`/equipment?isFeatured=true`);
+  return response;
 };
+
 export const updateEquipment = async (id: string, data: any) => {
-  try {
-    const slug = data.name ? slugify(data.name, { lower: true, strict: true }) : undefined;
-    const response = await httpClient.patch(`/equipment/${id}`, { ...data, slug });
-    return response;
-  } catch (error: any) {
-    console.error("Error updating equipment:", error);
-    return { success: false, message: error.message || "Failed to update equipment" };
-  }
+  const slug = data.name ? slugify(data.name, { lower: true, strict: true }) : undefined;
+  const response = await httpClient.patch(`/equipment/${id}`, { ...data, slug });
+  return response;
 };
 
 export const deleteEquipment = async (id: string) => {
-  try {
-    const response = await httpClient.delete(`/equipment/${id}`);
-    return response;
-  } catch (error: any) {
-    console.error("Error deleting equipment:", error);
-    return { success: false, message: error.message || "Failed to delete equipment" };
-  }
+  const response = await httpClient.delete(`/equipment/${id}`);
+  return response
 };
 
 export const getTestimonials = async () => {
-  try {
-    const response = await httpClient.get(`/reviews/testimonial`);
-    return response.success ? response.data : [];
-  } catch (error: any) {
-    console.error("Error getting testimonials:", error);
-    return [];
-  }
+  const response = await httpClient.get(`/reviews/testimonial`);
+  return response.success ? response.data : [];
 };
