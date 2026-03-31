@@ -1,7 +1,7 @@
 "use client"
 
 import { authClient } from "@/app/lib/auth-client";
-import { CalendarDays, FolderKanban, LayoutDashboard, LogOut, Settings, Users } from "lucide-react";
+import { CalendarDays, FolderKanban, LayoutDashboard, LogOut, Settings, Users, Tags } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -21,6 +21,7 @@ export default function SideNav({ role }: { role: string }) {
     ] : [
         { label: "System Overview", href: "/dashboard", icon: LayoutDashboard },
         { label: "Manage Inventory", href: "/dashboard/inventory", icon: FolderKanban },
+        { label: "Manage Categories", href: "/dashboard/categories", icon: Tags },
         { label: "Booking Approvals", href: "/dashboard/bookings", icon: CalendarDays },
         { label: "Customers", href: "/dashboard/users", icon: Users },
         { label: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -51,7 +52,7 @@ export default function SideNav({ role }: { role: string }) {
                             : "text-[#555] hover:bg-[#f9f8f6] hover:text-[#111]"
                             }`}
                     >
-                        <Icon size={18} className={isActive ? "text-[#e8612e]" : "text-[#aaa]"} />
+                        <Icon size={18} className={isActive ? "text-orange" : "text-[#aaa]"} />
                         {item.label}
                     </Link>
                 );
@@ -61,7 +62,7 @@ export default function SideNav({ role }: { role: string }) {
 
             {user && (
                 <div className="mb-1 mt-1 flex items-center gap-3 rounded-xl bg-[#f9f8f6] border border-[#f0ece5] px-3 py-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1e1e1e] text-xs font-bold text-[#e8612e]">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-charcoal-card text-xs font-bold text-orange">
                         {initials}
                     </div>
                     <div className="flex-1 min-w-0">
