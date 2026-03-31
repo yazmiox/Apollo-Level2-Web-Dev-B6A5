@@ -2,6 +2,8 @@ import { getAllCategories } from "@/app/actions/category";
 import { getAllEquipments } from "@/app/actions/equipment";
 import InventoryClient from "./InventoryClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminInventoryPage() {
   const [categoriesRes, equipmentsRes] = await Promise.all([
     getAllCategories(),

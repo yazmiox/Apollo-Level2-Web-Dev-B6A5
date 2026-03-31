@@ -2,11 +2,11 @@
 
 import { CheckCircle2, Loader2, MailCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "../lib/auth-client";
 
-export default function VerifyEmailPage() {
+function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -121,4 +121,18 @@ export default function VerifyEmailPage() {
       </main>
     </div>
   );
+}
+
+export default function VerifyEmail() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#f4f1ed]">
+          <Loader2 size={32} className="animate-spin text-[#e8612e]" />
+        </div>
+      }
+    >
+      <VerifyEmailPage />
+    </Suspense>
+  )
 }

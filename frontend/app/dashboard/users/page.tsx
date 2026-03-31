@@ -2,6 +2,8 @@ import { getCustomers } from "@/app/actions/customer";
 import SearchBox from "../_components/SearchBox";
 import UserListClient from "./_components/UserListClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminUsersPage() {
   const response = await getCustomers();
   const customers = response.success ? response.data : [];

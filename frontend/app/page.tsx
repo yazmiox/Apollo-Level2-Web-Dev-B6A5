@@ -7,6 +7,8 @@ import Testimonials from "./components/Testimonials";
 import TestimonialsSkeleton from "./components/TestimonialsSkeleton";
 import FeaturedEquipmentsSkeleton from "./components/FeaturedEquipmentsSkeleton";
 
+export const dynamic = "force-dynamic";
+
 const howItWorksSteps = [
   { number: "01", icon: "🔍", title: "Browse the Catalog", description: "Explore available equipment filtered by category, condition, and availability. See real-time status on every item." },
   { number: "02", icon: "📅", title: "Request a Booking", description: "Choose your dates and submit a request. Our system auto-blocks conflicting reservations — no double bookings." },
@@ -33,12 +35,9 @@ export default async function HomePage() {
   return (
     <>
       <Navbar />
-
       <main>
         {/* ── Section 1: Hero Section ── */}
         <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#111] py-20 px-4">
-
-          {/* Subtle noise grain */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 opacity-[0.025]"
@@ -46,15 +45,11 @@ export default async function HomePage() {
               backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
             }}
           />
-
-          {/* Epic center glow */}
           <div
             aria-hidden
             className="pointer-events-none absolute left-1/2 top-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-[120px]"
             style={{ background: "radial-gradient(circle, #e8612e 0%, transparent 70%)" }}
           />
-
-          {/* ── Centered copy ── */}
           <div className="relative mx-auto w-full max-w-5xl px-5 text-center lg:px-8">
 
             <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm">
@@ -94,8 +89,6 @@ export default async function HomePage() {
                 Get Started Free
               </Link>
             </div>
-
-            {/* Trust row */}
             <div className="animate-fade-up delay-400 mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-white/30">
               <span className="flex items-center gap-1.5"><span className="text-green-400">✓</span> Stripe secured payments</span>
               <span className="flex items-center gap-1.5"><span className="text-green-400">✓</span> No double bookings</span>
@@ -201,7 +194,6 @@ export default async function HomePage() {
 
         {/* ── Section 7: CTA ── */}
         <section className="relative overflow-hidden bg-[#e8612e] py-24 lg:py-32">
-          {/* Texture */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 opacity-10"
@@ -240,7 +232,6 @@ export default async function HomePage() {
           </div>
         </section>
       </main>
-
       <Footer />
     </>
   );

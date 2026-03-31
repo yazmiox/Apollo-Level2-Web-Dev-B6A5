@@ -3,12 +3,14 @@ import { getSession } from "@/app/lib/auth-server";
 import AdminBookings from "../_components/AdminBookings";
 import UserBookings from "../_components/UserBookings";
 
+export const dynamic = "force-dynamic";
+
 export default async function BookingsPage() {
   const session = await getSession();
   const user = session?.user;
 
   // Admin sees all system bookings
-  if (user.role === 'admin') {
+  if (user?.role === 'admin') {
     const bookings = await getAllBookings();
     return <AdminBookings initialBookings={bookings.data || []} />;
   }

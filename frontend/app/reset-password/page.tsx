@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { ArrowRight, CheckCircle2, Eye, EyeOff, KeyRound, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "../lib/auth-client";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const errorToken = searchParams.get("error");
@@ -185,5 +186,19 @@ export default function ResetPasswordPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#f4f1ed]">
+          <Loader2 size={32} className="animate-spin text-[#e8612e]" />
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
