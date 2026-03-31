@@ -25,7 +25,9 @@ export const createBookingSchema = z.object({
 });
 
 export const updateBookingStatusSchema = z.object({
-    status: z.enum(BookingStatus),
+    status: z.enum(BookingStatus, {
+        error: "Invalid status value",
+    }),
 });
 
 export const checkAvailabilitySchema = dateRangeSchema;
