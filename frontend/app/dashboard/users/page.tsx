@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
   const response = await getCustomers();
-  const customers = response.success ? response.data : [];
+  const customers = response.data || [];
 
   return (
     <div className="space-y-6">

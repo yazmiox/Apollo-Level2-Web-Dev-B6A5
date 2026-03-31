@@ -1,16 +1,7 @@
 "use client";
 
+import { CustomerStats } from "@/app/types";
 import { useSearchParams } from "next/navigation";
-
-// The data model for our backend customer API
-interface CustomerStats {
-  id: string;
-  name: string;
-  email: string;
-  totalSpent: number;
-  totalRentals: number;
-  joined: string;
-}
 
 export default function UserListClient({ initialData }: { initialData: CustomerStats[] }) {
   const searchParams = useSearchParams();

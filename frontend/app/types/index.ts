@@ -1,3 +1,5 @@
+import { useSearchParams } from "next/navigation";
+
 export type ApiResponse<T> = {
     success: boolean;
     message: string;
@@ -47,4 +49,13 @@ export type Equipment = {
     categoryId: string;
     category?: Category;
     isFeatured: boolean;
+}
+
+export interface CustomerStats {
+    id: string;
+    name: string;
+    email: string;
+    totalSpent: number;
+    totalRentals: number;
+    joined: string;
 }
