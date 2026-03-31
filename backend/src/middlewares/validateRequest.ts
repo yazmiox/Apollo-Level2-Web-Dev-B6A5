@@ -6,7 +6,8 @@ export const validateRequest = (schema: ZodType) =>
         const result = await schema.safeParseAsync(req.body)
         if (!result.success) {
             next(result.error)
+        } else {
+            req.body = result.data
+            next()
         }
-        req.body = result.data
-        next()
     };
