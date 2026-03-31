@@ -10,41 +10,61 @@ type CreateCategoryInput = {
 }
 
 export const createCategory = async (data: CreateCategoryInput) => {
-    const slug = slugify(data.name, {
-        lower: true,
-        strict: true
-    });
-    const response = await httpClient.post("/categories", {
-        ...data,
-        slug
-    });
-    return response;
+    try {
+        const slug = slugify(data.name, {
+            lower: true,
+            strict: true
+        });
+        const response = await httpClient.post("/categories", {
+            ...data,
+            slug
+        });
+        return response;
+    } catch (error: any) {
+        return { success: false as const, message: error?.message || "Something went wrong" };
+    }
 }
 
 export const getAllCategories = async (q?: string) => {
-    const url = q ? `/categories?q=${q}` : "/categories";
-    const response = await httpClient.get<Category[]>(url);
-    return response;
+    try {
+        const url = q ? `/categories?q=${q}` : "/categories";
+        const response = await httpClient.get<Category[]>(url);
+        return response;
+    } catch (error: any) {
+        return { success: false as const, message: error?.message || "Something went wrong" };
+    }
 }
 
 export const getCategory = async (slug: string) => {
-    const response = await httpClient.get(`/categories/${slug}`);
-    return response;
+    try {
+        const response = await httpClient.get(`/categories/${slug}`);
+        return response;
+    } catch (error: any) {
+        return { success: false as const, message: error?.message || "Something went wrong" };
+    }
 }
 
 export const updateCategory = async (id: string, data: CreateCategoryInput) => {
-    const slug = slugify(data.name, {
-        lower: true,
-        strict: true
-    });
-    const response = await httpClient.patch(`/categories/${id}`, {
-        ...data,
-        slug
-    });
-    return response;
+    try {
+        const slug = slugify(data.name, {
+            lower: true,
+            strict: true
+        });
+        const response = await httpClient.patch(`/categories/${id}`, {
+            ...data,
+            slug
+        });
+        return response;
+    } catch (error: any) {
+        return { success: false as const, message: error?.message || "Something went wrong" };
+    }
 }
 
 export const deleteCategory = async (id: string) => {
-    const response = await httpClient.delete(`/categories/${id}`);
-    return response;
+    try {
+        const response = await httpClient.delete(`/categories/${id}`);
+        return response;
+    } catch (error: any) {
+        return { success: false as const, message: error?.message || "Something went wrong" };
+    }
 }

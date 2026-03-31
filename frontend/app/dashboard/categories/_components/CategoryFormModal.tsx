@@ -13,6 +13,7 @@ interface CategoryFormModalProps {
 
 export default function CategoryFormModal({ onClose, onSuccess, initialData }: CategoryFormModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
   const isEditMode = !!initialData;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,11 +28,16 @@ export default function CategoryFormModal({ onClose, onSuccess, initialData }: C
 
     try {
       setIsSubmitting(true);
+      setValidationErrors({});
+
       const res = isEditMode
         ? await updateCategory(initialData.id, data)
         : await createCategory(data);
 
-      if (!res.success) throw new Error(res.message || "Something went wrong");
+      if (!res.success) {
+        if ((res as any).validationErrors) setValidationErrors((res as any).validationErrors);
+        throw new Error(res.message || "Something went wrong");
+      }
 
       toast.success(isEditMode ? "Category updated!" : "Category created!", { id: toastId });
       onSuccess();
@@ -81,8 +87,11 @@ export default function CategoryFormModal({ onClose, onSuccess, initialData }: C
               type="text"
               required
               placeholder="e.g. Audio, Drones"
-              className="rounded-[7px] border border-[#e0dbd3] px-3 py-2 text-sm text-[#111] outline-none focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e] transition-all"
+              className={`rounded-[7px] border px-3 py-2 text-sm text-[#111] outline-none transition-all ${validationErrors.name ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" : "border-[#e0dbd3] focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]"}`}
             />
+            {validationErrors.name && (
+              <p className="text-[11px] font-medium text-red-500">{validationErrors.name[0]}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -92,8 +101,11 @@ export default function CategoryFormModal({ onClose, onSuccess, initialData }: C
               defaultValue={initialData?.description}
               rows={3}
               placeholder="Brief description of this category..."
-              className="rounded-[7px] border border-[#e0dbd3] px-3 py-2 text-sm text-[#111] outline-none focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e] transition-all"
+              className={`rounded-[7px] border px-3 py-2 text-sm text-[#111] outline-none transition-all ${validationErrors.description ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" : "border-[#e0dbd3] focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]"}`}
             ></textarea>
+             {validationErrors.description && (
+              <p className="text-[11px] font-medium text-red-500">{validationErrors.description[0]}</p>
+            )}
           </div>
 
           <div className="pt-4 flex gap-3">
