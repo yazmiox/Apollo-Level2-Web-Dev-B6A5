@@ -9,17 +9,6 @@ export default function AdminInventoryLoading() {
           <div className="h-9 w-64 animate-pulse rounded-lg bg-[#f0ece5]" />
           <div className="h-5 w-96 animate-pulse rounded-lg bg-[#f0ece5]" />
         </div>
-
-        <div className="flex items-center gap-2 rounded-[8px] bg-[#f9f8f6] p-1 border border-[#e0dbd3]">
-          <div className="flex items-center gap-2 rounded-[6px] bg-white shadow-sm border border-[#e0dbd3] px-4 py-2 text-sm font-bold text-[#111]">
-            <Package size={16} className="text-[#aaa]" />
-            <div className="h-4 w-20 animate-pulse rounded bg-[#f0ece5]" />
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-[#777]">
-            <Tags size={16} className="text-[#ccc]" />
-            <div className="h-4 w-20 animate-pulse rounded bg-[#f9f8f6]" />
-          </div>
-        </div>
       </div>
 
       {/* Main Content Area */}

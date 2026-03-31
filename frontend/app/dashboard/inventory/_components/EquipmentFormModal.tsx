@@ -4,11 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { X, Image as ImageIcon, Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createEquipment, getUploadUrl, updateEquipment } from "@/app/actions/equipment";
-
-interface Category {
-  id: string;
-  name: string;
-}
+import { Category, Equipment } from "@/app/types";
 
 interface Specification {
   id: string;
@@ -18,9 +14,9 @@ interface Specification {
 
 interface EquipmentFormModalProps {
   onClose: () => void;
-  onSuccess: (item: any) => void;
+  onSuccess: () => void;
   categories: Category[];
-  initialData?: any;
+  initialData?: Equipment;
 }
 
 export default function EquipmentFormModal({ onClose, onSuccess, categories, initialData }: EquipmentFormModalProps) {
@@ -116,7 +112,7 @@ export default function EquipmentFormModal({ onClose, onSuccess, categories, ini
         });
 
         if (!presignedRes.success) throw new Error(presignedRes.message || "Failed to get upload URL");
-        const { key, uploadUrl } = presignedRes.data;
+        const { key, uploadUrl } = presignedRes.data!;
         finalImageKey = key;
 
         toast.loading(isEditMode ? "Updating equipment..." : "Adding equipment...", {
@@ -171,18 +167,16 @@ export default function EquipmentFormModal({ onClose, onSuccess, categories, ini
 
       toast.success(isEditMode ? "Equipment updated!" : "Equipment added!", { id: toastId, description: "" });
 
-      onSuccess({
-        ...res.data,
-        imageUrl: preview,
-        category: categories.find(c => c.id === res.data.categoryId) || res.data.category
-      });
+      onSuccess();
       onClose();
     } catch (err: any) {
+
       console.error("Submission Error:", err);
       toast.error(isEditMode ? "Update failed" : "Addition failed", {
         id: toastId,
         description: err.message || "Something went wrong"
       });
+
     } finally {
       setIsSubmitting(false);
     }
