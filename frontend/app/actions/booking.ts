@@ -2,14 +2,30 @@
 
 import httpClient from "../lib/httpClient"
 
-export async function getMyBookings() {
-    const res = await httpClient.get(`/bookings/my`)
-    return res
+import { ApiResponse, Booking } from "../types"
+
+export async function getMyBookings(params: { q?: string; status?: string } = {}) {
+    const searchParams = new URLSearchParams();
+    if (params.q) searchParams.set("q", params.q);
+    if (params.status) searchParams.set("status", params.status);
+    
+    const queryString = searchParams.toString();
+    const url = `/bookings/my${queryString ? `?${queryString}` : ""}`;
+
+    const res = await httpClient.get<Booking[]>(url)
+    return res as ApiResponse<Booking[]>
 }
 
-export async function getAllBookings() {
-    const res = await httpClient.get(`/bookings`)
-    return res
+export async function getAllBookings(params: { q?: string; status?: string } = {}) {
+    const searchParams = new URLSearchParams();
+    if (params.q) searchParams.set("q", params.q);
+    if (params.status) searchParams.set("status", params.status);
+    
+    const queryString = searchParams.toString();
+    const url = `/bookings${queryString ? `?${queryString}` : ""}`;
+
+    const res = await httpClient.get<Booking[]>(url)
+    return res as ApiResponse<Booking[]>
 }
 
 export async function updateBookingStatus(bookingId: string, status: string) {
@@ -18,21 +34,11 @@ export async function updateBookingStatus(bookingId: string, status: string) {
 }
 
 export async function checkAvailability(data: { equipmentId: string, startDate: string, endDate: string }) {
-    try {
-        const res = await httpClient.post(`/bookings/availability`, data);
-        return res;
-    } catch (error: any) {
-        console.error("Error checking availability:", error);
-        return { success: false, message: error.message || "Failed to check availability" };
-    }
+    const res = await httpClient.post(`/bookings/availability`, data);
+    return res;
 }
 
 export async function createBooking(data: any) {
-    try {
-        const res = await httpClient.post(`/bookings`, data);
-        return res;
-    } catch (error: any) {
-        console.error("Error creating booking:", error);
-        return { success: false, message: error.message || "Failed to create booking" };
-    }
+    const res = await httpClient.post(`/bookings`, data);
+    return res;
 }
