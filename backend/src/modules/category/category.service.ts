@@ -9,7 +9,8 @@ export const getAllCategories = async (q?: string) => {
                 { name: { contains: q, mode: "insensitive" } },
                 { description: { contains: q, mode: "insensitive" } },
             ]
-        } : {}
+        } : {},
+        orderBy: { updatedAt: "desc" }
     });
     return categories;
 }

@@ -50,7 +50,7 @@ export const getAllEquipments = async (params: {
     if (sort === "price-asc") orderBy.rentalRate = "asc";
     else if (sort === "price-desc") orderBy.rentalRate = "desc";
     else if (sort === "name-asc") orderBy.name = "asc";
-    else orderBy.createdAt = "desc";
+    else orderBy.updatedAt = "desc";
 
     const [equipments, total, ratings] = await Promise.all([
         prisma.equipment.findMany({

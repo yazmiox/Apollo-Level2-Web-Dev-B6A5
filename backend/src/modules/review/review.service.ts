@@ -14,7 +14,7 @@ export const getReviewsByEquipmentId = async (equipmentId: string) => {
         },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { updatedAt: "desc" },
   });
 };
 
@@ -33,7 +33,7 @@ export const getTestimonials = async (limit: number = 3) => {
     },
     orderBy: [
       { rating: "desc" },
-      { createdAt: "desc" },
+      { updatedAt: "desc" },
     ],
     take: limit,
   });

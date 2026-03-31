@@ -63,7 +63,7 @@ export const getAllBookings = async (params: { q?: string; status?: string; user
             review: true,
         },
         orderBy: {
-            createdAt: "desc"
+            updatedAt: "desc"
         }
     });
 

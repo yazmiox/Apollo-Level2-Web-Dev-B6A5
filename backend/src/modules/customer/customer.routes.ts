@@ -21,7 +21,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
                     select: { bookings: true }
                 }
             },
-            orderBy: { createdAt: "desc" }
+            orderBy: { updatedAt: "desc" }
         });
 
         const customers = users.map((user) => ({

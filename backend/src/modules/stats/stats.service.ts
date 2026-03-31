@@ -100,7 +100,7 @@ export const getStats = async (role: string, userId?: string) => {
                 user: { select: { name: true } },
                 equipment: { select: { name: true } }
             },
-            orderBy: { createdAt: "desc" },
+            orderBy: { updatedAt: "desc" },
             take: 5
         })
     ]);
