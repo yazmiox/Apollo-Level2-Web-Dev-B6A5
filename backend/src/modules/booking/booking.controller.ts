@@ -13,11 +13,12 @@ export const checkAvailability = async (req: Request, res: Response, next: NextF
 
 export const getMyBookings = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // userId should come from auth middleware
         const userId = (req as any).user?.id;
         if (!userId) throw new ApiError(401, "Unauthorized");
 
-        const bookings = await bookingService.getAllBookings({ userId });
+        const { q, status } = req.query;
+
+        const bookings = await bookingService.getAllBookings({ userId, q: q as string, status: status as string });
         res.status(200).json({ success: true, data: bookings });
     } catch (error) {
         next(error);
@@ -26,7 +27,8 @@ export const getMyBookings = async (req: Request, res: Response, next: NextFunct
 
 export const getAllBookings = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const bookings = await bookingService.getAllBookings();
+        const { q, status } = req.query;
+        const bookings = await bookingService.getAllBookings({ q: q as string, status: status as string });
         res.status(200).json({ success: true, data: bookings });
     } catch (error) {
         next(error);

@@ -40,14 +40,30 @@ const calculateBookingAmount = (rentalRate: number, start: Date, end: Date) => {
     return rentalRate * durationDays;
 };
 
-export const getAllBookings = async (filters: Record<string, unknown> = {}) => {
+export const getAllBookings = async (params: { q?: string; status?: string; userId?: string } = {}) => {
+    const { q, status, userId } = params;
+
+    const where: any = {};
+    if (userId) where.userId = userId;
+    if (status) where.status = status;
+    if (q) {
+        where.OR = [
+            { user: { name: { contains: q, mode: "insensitive" } } },
+            { user: { email: { contains: q, mode: "insensitive" } } },
+            { equipment: { name: { contains: q, mode: "insensitive" } } },
+        ];
+    }
+
     const bookings = await prisma.booking.findMany({
-        where: filters,
+        where,
         include: {
             user: true,
             equipment: true,
             payment: true,
             review: true,
+        },
+        orderBy: {
+            createdAt: "desc"
         }
     });
 
