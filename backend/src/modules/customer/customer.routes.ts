@@ -33,7 +33,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
             joined: user.createdAt.toISOString()
         }));
 
-        res.status(200).json({ success: true, data: customers });
+        res.status(200).json({ success: true, message: "Customers fetched successfully", data: customers });
     } catch (error) {
         next(error);
     }

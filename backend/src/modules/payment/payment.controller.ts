@@ -7,7 +7,7 @@ export const createCheckoutSession = async (req: Request, res: Response, next: N
         const userId = req.user.id;
         const { bookingId } = req.params;
         const session = await paymentService.createCheckoutSession(userId, bookingId as string);
-        res.status(200).json({ success: true, data: session });
+        res.status(200).json({ success: true, message: "Checkout session created successfully", data: session });
     } catch (error) {
         next(error)
     }

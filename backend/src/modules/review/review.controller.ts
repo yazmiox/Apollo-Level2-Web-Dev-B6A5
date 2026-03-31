@@ -5,7 +5,7 @@ import { createReviewSchema, updateReviewSchema } from "./review.schema";
 export const getReviewsByEquipmentId = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const reviews = await reviewService.getReviewsByEquipmentId(req.params.equipmentId as string);
-    res.json({ success: true, data: reviews });
+    res.json({ success: true, message: "Reviews fetched successfully", data: reviews });
   } catch (error) {
     next(error);
   }
@@ -14,7 +14,7 @@ export const getReviewsByEquipmentId = async (req: Request, res: Response, next:
 export const getTestimonials = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const reviews = await reviewService.getTestimonials(3);
-    res.json({ success: true, data: reviews });
+    res.json({ success: true, message: "Testimonials fetched successfully", data: reviews });
   } catch (error) {
     next(error);
   }
@@ -43,7 +43,7 @@ export const updateReview = async (req: Request, res: Response, next: NextFuncti
 export const deleteReview = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await reviewService.deleteReview(req.user.id, req.params.id as string);
-    res.json({ success: true, message: "Review deleted successfully" });
+    res.json({ success: true, message: "Review deleted successfully", data: null });
   } catch (error) {
     next(error);
   }

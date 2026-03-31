@@ -16,7 +16,7 @@ export const getAllEquipments = async (req: Request, res: Response, next: NextFu
         if (isFeatured) filters.isFeatured = isFeatured === "true";
 
         const equipments = await equipmentService.getAllEquipments(filters);
-        res.status(200).json({ success: true, ...equipments });
+        res.status(200).json({ success: true, message: "Equipments fetched successfully", ...equipments });
     } catch (error) {
         next(error);
     }
@@ -26,7 +26,7 @@ export const getEquipment = async (req: Request, res: Response, next: NextFuncti
     try {
         const { slug } = req.params;
         const equipment = await equipmentService.getEquipmentBySlug(slug as string);
-        res.status(200).json({ success: true, data: equipment });
+        res.status(200).json({ success: true, message: "Equipment fetched successfully", data: equipment });
     } catch (error) {
         next(error);
     }
@@ -35,7 +35,7 @@ export const getEquipment = async (req: Request, res: Response, next: NextFuncti
 export const createEquipmentImageUploadUrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await equipmentService.createEquipmentImageUpload(req.body);
-        res.status(200).json({ success: true, data: result });
+        res.status(200).json({ success: true, message: "Image upload URL created successfully", data: result });
     } catch (error) {
         next(error);
     }
@@ -44,7 +44,7 @@ export const createEquipmentImageUploadUrl = async (req: Request, res: Response,
 export const createEquipment = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const equipment = await equipmentService.createEquipment(req.body);
-        res.status(201).json({ success: true, data: equipment });
+        res.status(201).json({ success: true, message: "Equipment created successfully", data: equipment });
     } catch (error) {
         next(error);
     }
@@ -54,7 +54,7 @@ export const updateEquipment = async (req: Request, res: Response, next: NextFun
     try {
         const { id } = req.params;
         const equipment = await equipmentService.updateEquipment(id as string, req.body);
-        res.status(200).json({ success: true, data: equipment });
+        res.status(200).json({ success: true, message: "Equipment updated successfully", data: equipment });
     } catch (error) {
         next(error);
     }
@@ -64,7 +64,7 @@ export const deleteEquipment = async (req: Request, res: Response, next: NextFun
     try {
         const { id } = req.params;
         await equipmentService.deleteEquipment(id as string);
-        res.status(200).json({ success: true, message: "Equipment deleted successfully" });
+        res.status(200).json({ success: true, message: "Equipment deleted successfully", data: null });
     } catch (error) {
         next(error);
     }
