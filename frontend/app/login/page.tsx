@@ -45,19 +45,19 @@ export default function LoginPage() {
       <main className="flex flex-1 items-center justify-center px-5 py-24 lg:px-8">
         <div className="w-full max-w-md animate-in slide-in-from-bottom-8 fade-in duration-500">
 
-          <div className="mb-8 text-center">
-            <div className="text-black">
-              <Logo color="text-black" />
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#111] sm:text-4xl" style={{ fontFamily: "var(--font-display)" }}>
-              Welcome back
-            </h1>
-            <p className="mt-2 text-sm text-[#777]">
-              Enter your credentials to access your account.
-            </p>
+          <div className="mb-10 flex justify-center">
+            <Logo size="lg" />
           </div>
 
-          <div className="rounded-2xl border border-[#e0dbd3] bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-3xl border border-[#e0dbd3] bg-white p-8 shadow-sm sm:p-10">
+            <div className="mb-8 text-center">
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
+                Welcome back
+              </h1>
+              <p className="mt-1.5 text-sm text-[#777]">
+                Enter your credentials to access your account.
+              </p>
+            </div>
             {error && (
               <div className="text-center">
                 <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-medium text-red-600 ring-1 ring-inset ring-red-600/10">
