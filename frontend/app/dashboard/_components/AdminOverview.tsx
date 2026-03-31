@@ -13,17 +13,20 @@ export default function AdminOverview({ stats }: { stats: any }) {
 
   const handleStatusChange = async (id: string, status: string) => {
     setLoadingId(id + "_" + status);
-    try {
-      await updateBookingStatus(id, status);
-      setPendingRequests((prev: any[]) =>
-        prev.map((req) => (req.id === id ? { ...req, status } : req))
-      );
-      toast.success(`Booking ${status.toLowerCase().replace("_", " ")} successfully`);
-    } catch (error) {
-      toast.error("Failed to update booking status");
-    } finally {
-      setLoadingId(null);
+
+    const response = await updateBookingStatus(id, status);
+
+    setLoadingId(null);
+    if (!response.success) {
+      toast.error(response.message);
+      return;
     }
+
+    setPendingRequests((prev: any[]) =>
+      prev.map((req) => (req.id === id ? { ...req, status } : req))
+    );
+
+    toast.success(`Booking ${status.toLowerCase().replace("_", " ")} successfully`);
   };
 
   const statsArr = [
@@ -78,53 +81,58 @@ export default function AdminOverview({ stats }: { stats: any }) {
             </Link>
           </div>
           <div className="divide-y divide-[#f0ece5] flex-1">
-            {pendingRequests.map((req: any) => (
-              <div key={req.id} className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 gap-4">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm font-bold text-[#111]">{req.equipment.name}</p>
-                  <div className="flex items-center gap-2 text-xs font-medium text-[#777]">
-                    <span className="text-[#111]">{req.user.name}</span>
-                    <span>•</span>
-                    <div className="flex items-center gap-1.5 text-[#555] font-medium">
-                      <Calendar size={13} className="text-[#aaa]" />
-                      {formatDateShort(req.startDate)} <ChevronRight size={12} className="text-[#ccc] mx-0.5" /> {formatDateShort(req.endDate)}
+            {pendingRequests.length === 0 ? (
+              <div className="flex items-center justify-center h-24">
+                <p className="text-sm text-[#888]">No pending requests</p>
+              </div>
+            ) :
+              pendingRequests.map((req: any) => (
+                <div key={req.id} className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm font-bold text-[#111]">{req.equipment.name}</p>
+                    <div className="flex items-center gap-2 text-xs font-medium text-[#777]">
+                      <span className="text-[#111]">{req.user.name}</span>
+                      <span>•</span>
+                      <div className="flex items-center gap-1.5 text-[#555] font-medium">
+                        <Calendar size={13} className="text-[#aaa]" />
+                        {formatDateShort(req.startDate)} <ChevronRight size={12} className="text-[#ccc] mx-0.5" /> {formatDateShort(req.endDate)}
+                      </div>
+                      <span>•</span>
+                      <span className="font-bold text-[#e8612e]">{req.amount}</span>
                     </div>
-                    <span>•</span>
-                    <span className="font-bold text-[#e8612e]">{req.amount}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {req.status === "PENDING_APPROVAL" ? (
+                      <>
+                        <button
+                          disabled={loadingId !== null}
+                          onClick={() => handleStatusChange(req.id, "REJECTED")}
+                          className="flex items-center gap-1.5 rounded-[6px] border border-[#e0dbd3] bg-white px-3 py-1.5 text-xs font-bold text-red-600 transition-all hover:bg-red-50 hover:border-red-200 active:scale-95 disabled:pointer-events-none disabled:opacity-75"
+                        >
+                          {loadingId === req.id + "_REJECTED" ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
+                          Reject
+                        </button>
+                        <button
+                          disabled={loadingId !== null}
+                          onClick={() => handleStatusChange(req.id, "AWAITING_PAYMENT")}
+                          className="flex items-center gap-1.5 rounded-[6px] bg-[#111] px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-[#333] active:scale-95 shadow-sm disabled:pointer-events-none disabled:opacity-75"
+                        >
+                          {loadingId === req.id + "_AWAITING_PAYMENT" ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                          Approve
+                        </button>
+                      </>
+                    ) : req.status === "REJECTED" ? (
+                      <div className="flex items-center gap-1.5 rounded-full bg-red-50/50 px-3 py-1 text-[11px] font-bold text-red-600 border border-red-100/50">
+                        <X size={14} className="bg-red-600 text-white rounded-full p-0.5" /> Rejected
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 rounded-full bg-green-50/50 px-3 py-1 text-[11px] font-bold text-green-600 border border-green-100/50">
+                        <Check size={14} className="bg-green-600 text-white rounded-full p-0.5" /> Approved
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  {req.status === "PENDING_APPROVAL" ? (
-                    <>
-                      <button
-                        disabled={loadingId !== null}
-                        onClick={() => handleStatusChange(req.id, "REJECTED")}
-                        className="flex items-center gap-1.5 rounded-[6px] border border-[#e0dbd3] bg-white px-3 py-1.5 text-xs font-bold text-red-600 transition-all hover:bg-red-50 hover:border-red-200 active:scale-95 disabled:pointer-events-none disabled:opacity-75"
-                      >
-                        {loadingId === req.id + "_REJECTED" ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
-                        Reject
-                      </button>
-                      <button
-                        disabled={loadingId !== null}
-                        onClick={() => handleStatusChange(req.id, "AWAITING_PAYMENT")}
-                        className="flex items-center gap-1.5 rounded-[6px] bg-[#111] px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-[#333] active:scale-95 shadow-sm disabled:pointer-events-none disabled:opacity-75"
-                      >
-                        {loadingId === req.id + "_AWAITING_PAYMENT" ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                        Approve
-                      </button>
-                    </>
-                  ) : req.status === "REJECTED" ? (
-                    <div className="flex items-center gap-1.5 rounded-full bg-red-50/50 px-3 py-1 text-[11px] font-bold text-red-600 border border-red-100/50">
-                      <X size={14} className="bg-red-600 text-white rounded-full p-0.5" /> Rejected
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5 rounded-full bg-green-50/50 px-3 py-1 text-[11px] font-bold text-green-600 border border-green-100/50">
-                      <Check size={14} className="bg-green-600 text-white rounded-full p-0.5" /> Approved
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
 
