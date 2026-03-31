@@ -1,16 +1,12 @@
-import { useSearchParams } from "next/navigation";
-
 export type ApiResponse<T> = {
-    success: boolean;
+    success: true;
     message: string;
-    data?: T;
+    data: T;
+    metadata?: any
+} | {
+    success: false;
+    message: string;
     validationErrors?: Record<string, string[]>;
-    metadata?: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    }
 }
 
 export type EquipmentSearchParams = {
