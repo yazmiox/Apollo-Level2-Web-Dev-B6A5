@@ -7,6 +7,13 @@ const dateRangeSchema = z.object({
     }),
     startDate: z.iso.datetime("Invalid start date format"),
     endDate: z.iso.datetime("Invalid end date format"),
+}).refine((data) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return new Date(data.startDate).getTime() >= today.getTime();
+}, {
+    message: "Start date cannot be in the past",
+    path: ["startDate"],
 }).refine((data) => new Date(data.startDate) < new Date(data.endDate), {
     message: "End date must be after start date",
     path: ["endDate"],

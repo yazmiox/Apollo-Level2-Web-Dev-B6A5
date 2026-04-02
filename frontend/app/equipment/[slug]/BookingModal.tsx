@@ -18,6 +18,13 @@ export default function BookingModal({ item, onClose }: BookingModalProps) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [availabilityMessage, setAvailabilityMessage] = useState<string>("");
   const [submissionError, setSubmissionError] = useState<string>("");
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+
+  const getValidationClass = (field: string) => {
+    return validationErrors[field] && validationErrors[field].length > 0
+      ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 bg-red-50/50"
+      : "border-[#e0dbd3] focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]";
+  };
 
   useEffect(() => {
     const performCheck = async () => {
@@ -35,6 +42,7 @@ export default function BookingModal({ item, onClose }: BookingModalProps) {
           });
 
           if (res.success) {
+            setValidationErrors({});
             setIsAvailable(res.data.available);
             if (!res.data.available) {
               if (res.data.conflict) {
@@ -46,6 +54,11 @@ export default function BookingModal({ item, onClose }: BookingModalProps) {
               }
             }
           } else {
+            if ((res as any).validationErrors) {
+              setValidationErrors((res as any).validationErrors);
+            } else {
+              setValidationErrors({});
+            }
             setIsAvailable(false);
             setAvailabilityMessage(res.message || "Could not verify availability");
           }
@@ -69,6 +82,7 @@ export default function BookingModal({ item, onClose }: BookingModalProps) {
 
     setIsSubmitting(true);
     setSubmissionError("");
+    setValidationErrors({});
 
     try {
       const res = await createBooking({
@@ -82,6 +96,7 @@ export default function BookingModal({ item, onClose }: BookingModalProps) {
         toast.success("Booking request submitted successfully! An admin will review it soon.");
         onClose();
       } else {
+        if ((res as any).validationErrors) setValidationErrors((res as any).validationErrors);
         setSubmissionError(res.message || "Failed to create booking. Please try again.");
       }
     } catch (error: any) {
@@ -115,8 +130,11 @@ export default function BookingModal({ item, onClose }: BookingModalProps) {
               <input
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="rounded-[7px] border border-[#e0dbd3] px-3 py-2 text-sm text-[#111] outline-none focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]"
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setValidationErrors(prev => ({...prev, startDate: []}));
+                }}
+                className={`rounded-[7px] border px-3 py-2 text-sm text-[#111] outline-none transition-all ${getValidationClass("startDate")}`}
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -124,8 +142,11 @@ export default function BookingModal({ item, onClose }: BookingModalProps) {
               <input
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="rounded-[7px] border border-[#e0dbd3] px-3 py-2 text-sm text-[#111] outline-none focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]"
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setValidationErrors(prev => ({...prev, endDate: []}));
+                }}
+                className={`rounded-[7px] border px-3 py-2 text-sm text-[#111] outline-none transition-all ${getValidationClass("endDate")}`}
               />
             </div>
           </div>
@@ -142,7 +163,7 @@ export default function BookingModal({ item, onClose }: BookingModalProps) {
               ) : (
                 <>
                   <AlertCircle size={14} />
-                  {availabilityMessage || "Already booked for these dates."}
+                  {validationErrors.startDate?.[0] || validationErrors.endDate?.[0] || availabilityMessage || "Already booked for these dates."}
                 </>
               )}
             </div>
