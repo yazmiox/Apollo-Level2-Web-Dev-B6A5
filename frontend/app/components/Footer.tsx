@@ -28,8 +28,7 @@ export default function Footer() {
               {[
                 { label: "Browse Equipment", href: "/equipment" },
                 { label: "Book Equipment", href: "/equipment" },
-                { label: "My Bookings", href: "/dashboard/bookings" },
-                { label: "Payment History", href: "/dashboard/payments" },
+                { label: "My Bookings", href: "/dashboard/bookings" }
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm text-white/40 transition-colors hover:text-white">
