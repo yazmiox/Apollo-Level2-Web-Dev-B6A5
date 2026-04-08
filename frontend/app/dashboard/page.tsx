@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   }
 
   const statsRes = await getStats();
-  const stats = statsRes.data!;
+  const stats = statsRes.data;
   const user = session.user;
 
   if (user.role === "admin") {

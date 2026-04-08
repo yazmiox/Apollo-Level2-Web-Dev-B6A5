@@ -7,12 +7,11 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 interface BookingActionsProps {
-    role: string;
     bookingId: string;
     currentStatus: string;
 }
 
-export default function BookingActions({ role, bookingId, currentStatus }: BookingActionsProps) {
+export default function BookingActions({ bookingId, currentStatus }: BookingActionsProps) {
     const [isLoading, setIsLoading] = useState<string | null>(null);
     const router = useRouter();
 

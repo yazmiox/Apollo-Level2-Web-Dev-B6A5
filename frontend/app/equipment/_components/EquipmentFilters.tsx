@@ -1,8 +1,9 @@
 "use client";
 
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, Package, Tag } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useTransition, useEffect, useState } from "react";
+import { useTransition, useEffect, useRef, useState, useCallback } from "react";
+import { AiSuggestion, getAiSuggestions } from "@/app/actions/ai";
 
 interface Category {
   id: string;
@@ -34,21 +35,36 @@ export default function EquipmentFilters({ categories }: EquipmentFiltersProps) 
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "all");
   const [status, setStatus] = useState(searchParams.get("status") || "all");
   const [sort, setSort] = useState(searchParams.get("sort") || "default");
+  const [suggestions, setSuggestions] = useState<AiSuggestion[]>([]);
+  const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
 
   // Sync state with URL when it changes (back/forward navigation)
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setQ(searchParams.get("q") || "");
     setCategory(searchParams.get("category") || "all");
     setStatus(searchParams.get("status") || "all");
     setSort(searchParams.get("sort") || "default");
   }, [searchParams]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-  const updateParams = (updates: Record<string, string>) => {
+  useEffect(() => {
+    return () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const updateParams = useCallback((updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
 
     // Reset to page 1 on any filter change
@@ -65,6 +81,22 @@ export default function EquipmentFilters({ categories }: EquipmentFiltersProps) 
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
     });
+  }, [pathname, router, searchParams, startTransition]);
+
+  const handleSuggestionSelect = (suggestion: AiSuggestion) => {
+    setIsSearchFocused(false);
+    setSuggestions([]);
+    setActiveSuggestionIndex(-1);
+
+    if (suggestion.type === "item") {
+      setQ(suggestion.title);
+      router.push(`/equipment/${suggestion.slug}`);
+      return;
+    }
+
+    setQ("");
+    setCategory(suggestion.slug);
+    updateParams({ q: "", category: suggestion.slug });
   };
 
   // Debounced search for the text input
@@ -75,7 +107,33 @@ export default function EquipmentFilters({ categories }: EquipmentFiltersProps) 
       }
     }, 400);
     return () => clearTimeout(timer);
+  }, [q, searchParams, updateParams]);
+
+  // Debounced AI suggestions on user input
+  useEffect(() => {
+    const normalizedQuery = q.trim();
+
+    if (normalizedQuery.length < 2) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setIsSuggestionsLoading(true);
+      const results = await getAiSuggestions(normalizedQuery, controller.signal);
+      setSuggestions(results);
+      setActiveSuggestionIndex(-1);
+      setIsSuggestionsLoading(false);
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [q]);
+
+  const showSuggestions =
+    isSearchFocused && q.trim().length > 1 && (isSuggestionsLoading || suggestions.length > 0);
 
   return (
     <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -94,9 +152,85 @@ export default function EquipmentFilters({ categories }: EquipmentFiltersProps) 
             type="text"
             placeholder="Search equipment, brand..."
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setQ(nextValue);
+
+              if (nextValue.trim().length < 2) {
+                setSuggestions([]);
+                setActiveSuggestionIndex(-1);
+                setIsSuggestionsLoading(false);
+              }
+            }}
+            onFocus={() => {
+              if (blurTimeoutRef.current) {
+                clearTimeout(blurTimeoutRef.current);
+              }
+              setIsSearchFocused(true);
+            }}
+            onBlur={() => {
+              blurTimeoutRef.current = setTimeout(() => {
+                setIsSearchFocused(false);
+                setActiveSuggestionIndex(-1);
+              }, 120);
+            }}
+            onKeyDown={(e) => {
+              if (!showSuggestions || suggestions.length === 0) return;
+
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActiveSuggestionIndex((prev) => (prev + 1) % suggestions.length);
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActiveSuggestionIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+              } else if (e.key === "Enter" && activeSuggestionIndex >= 0) {
+                e.preventDefault();
+                handleSuggestionSelect(suggestions[activeSuggestionIndex]);
+              } else if (e.key === "Escape") {
+                setIsSearchFocused(false);
+                setActiveSuggestionIndex(-1);
+              }
+            }}
             className="w-full rounded-[7px] border border-[#e0dbd3] bg-[#f9f8f6] py-2.5 pl-9 pr-4 text-sm text-[#111] placeholder-[#aaa] outline-none focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]/30 transition-all"
           />
+
+          {showSuggestions && (
+            <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-[#e0dbd3] bg-white shadow-xl">
+              {isSuggestionsLoading ? (
+                <div className="flex items-center gap-2 px-4 py-3 text-xs font-medium text-[#777]">
+                  <Loader2 size={14} className="animate-spin" />
+                  Finding smart suggestions...
+                </div>
+              ) : (
+                <div className="py-1">
+                  {suggestions.map((suggestion, index) => {
+                    const isActive = index === activeSuggestionIndex;
+                    return (
+                      <button
+                        key={`${suggestion.type}-${suggestion.slug}`}
+                        type="button"
+                        onMouseDown={(event) => event.preventDefault()}
+                        onMouseEnter={() => setActiveSuggestionIndex(index)}
+                        onClick={() => handleSuggestionSelect(suggestion)}
+                        className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors ${isActive
+                          ? "bg-[#fff1ea] text-[#111]"
+                          : "text-[#555] hover:bg-[#f9f8f6]"
+                          }`}
+                      >
+                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#f3eee7] text-[#7a6f63]">
+                          {suggestion.type === "item" ? <Package size={14} /> : <Tag size={14} />}
+                        </span>
+                        <span className="flex-1 text-sm font-medium">{suggestion.title}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#aaa]">
+                          {suggestion.type}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Status Filter */}
