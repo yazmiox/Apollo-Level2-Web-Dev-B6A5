@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-white/5 bg-[#111]">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div className="sm:col-span-2">
             <Logo color="text-white" />
@@ -30,6 +30,26 @@ export default function Footer() {
                 { label: "Book Equipment", href: "/equipment" },
                 { label: "My Bookings", href: "/dashboard/bookings" },
                 { label: "Payment History", href: "/dashboard/payments" },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-sm text-white/40 transition-colors hover:text-white">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h4 className="mb-5 text-[10px] font-bold uppercase tracking-[0.15em] text-white/30">
+              Company
+            </h4>
+            <ul className="flex flex-col gap-3">
+              {[
+                { label: "About", href: "/about" },
+                { label: "Contact", href: "/contact" },
+                { label: "Privacy", href: "/privacy" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm text-white/40 transition-colors hover:text-white">
