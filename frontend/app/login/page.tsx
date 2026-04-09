@@ -7,6 +7,16 @@ import { useState } from "react";
 import { authClient } from "../lib/auth-client";
 import Logo from "../components/Logo";
 
+const DEMO_USER_CREDENTIALS = {
+  email: process.env.NEXT_PUBLIC_DEMO_USER_EMAIL ?? "",
+  password: process.env.NEXT_PUBLIC_DEMO_USER_PASSWORD ?? "",
+};
+
+const DEMO_ADMIN_CREDENTIALS = {
+  email: process.env.NEXT_PUBLIC_DEMO_ADMIN_EMAIL ?? "",
+  password: process.env.NEXT_PUBLIC_DEMO_ADMIN_PASSWORD ?? "",
+};
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -14,6 +24,21 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const router = useRouter();
+
+  const fillDemoCredentials = (type: "user" | "admin") => {
+    const credentials = type === "admin" ? DEMO_ADMIN_CREDENTIALS : DEMO_USER_CREDENTIALS;
+
+    if (!credentials.email || !credentials.password) {
+      setError(
+        `Demo ${type} credentials are not configured yet. Please set NEXT_PUBLIC_DEMO_${type.toUpperCase()}_EMAIL and NEXT_PUBLIC_DEMO_${type.toUpperCase()}_PASSWORD.`
+      );
+      return;
+    }
+
+    setError(null);
+    setEmail(credentials.email);
+    setPassword(credentials.password);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,6 +152,23 @@ export default function LoginPage() {
                 )}
               </button>
             </form>
+
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => fillDemoCredentials("user")}
+                className="rounded-[8px] border border-[#e0dbd3] bg-[#f9f8f6] px-3 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-[#555] hover:border-[#e8612e]/40 hover:text-[#e8612e]"
+              >
+                Login as Demo User
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemoCredentials("admin")}
+                className="rounded-[8px] border border-[#e0dbd3] bg-[#f9f8f6] px-3 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-[#555] hover:border-[#e8612e]/40 hover:text-[#e8612e]"
+              >
+                Login as Demo Admin
+              </button>
+            </div>
 
             <div className="mt-6 flex items-center gap-4">
               <div className="h-px flex-1 bg-[#f0ece5]" />
