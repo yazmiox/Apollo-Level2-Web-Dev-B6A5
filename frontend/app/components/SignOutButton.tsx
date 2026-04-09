@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 
 interface SignOutButtonProps {
   isMobile?: boolean;
+  isDropdown?: boolean;
 }
 
-export default function SignOutButton({ isMobile }: SignOutButtonProps) {
+export default function SignOutButton({ isMobile, isDropdown }: SignOutButtonProps) {
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -30,6 +31,18 @@ export default function SignOutButton({ isMobile }: SignOutButtonProps) {
       >
         <LogOut size={16} />
         Sign Out
+      </button>
+    );
+  }
+
+  if (isDropdown) {
+    return (
+      <button
+        onClick={handleSignOut}
+        className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium text-[#ff8a63] hover:bg-white/5 hover:text-[#ff9b79] transition-colors"
+      >
+        <LogOut size={16} />
+        Logout
       </button>
     );
   }

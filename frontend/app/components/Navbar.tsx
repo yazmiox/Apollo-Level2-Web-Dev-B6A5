@@ -8,7 +8,7 @@ export default function Navbar() {
     <NavbarClient
       authArea={
         <Suspense fallback={<AuthSkeleton />}>
-          <AuthArea />
+          <AuthArea enableDropdown />
         </Suspense>
       }
       mobileAuthArea={
