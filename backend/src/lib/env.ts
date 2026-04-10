@@ -14,5 +14,7 @@ export const {
     R2_BUCKET_NAME,
     R2_SIGNED_URL_EXPIRY_HOUR,
     EMAIL,
-    EMAIL_APP_PASS
+    EMAIL_APP_PASS,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET
 } = process.env
