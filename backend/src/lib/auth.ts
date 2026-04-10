@@ -16,6 +16,9 @@ export const auth = betterAuth({
             clientSecret: GOOGLE_CLIENT_SECRET!,
         },
     },
+    account: {
+        skipStateCookieCheck: true,
+    },
     user: {
         additionalFields: {
             role: {
