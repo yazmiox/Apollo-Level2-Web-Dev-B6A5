@@ -17,6 +17,11 @@ const DEMO_ADMIN_CREDENTIALS = {
   password: process.env.NEXT_PUBLIC_DEMO_ADMIN_PASSWORD ?? "",
 };
 
+const DEMO_VENDOR_CREDENTIALS = {
+  email: process.env.NEXT_PUBLIC_DEMO_VENDOR_EMAIL ?? "",
+  password: process.env.NEXT_PUBLIC_DEMO_VENDOR_PASSWORD ?? "",
+};
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -26,8 +31,11 @@ export default function LoginPage() {
   const [isGoogleLoggingIn, setIsGoogleLoggingIn] = useState(false);
   const router = useRouter();
 
-  const fillDemoCredentials = (type: "user" | "admin") => {
-    const credentials = type === "admin" ? DEMO_ADMIN_CREDENTIALS : DEMO_USER_CREDENTIALS;
+  const fillDemoCredentials = (type: "user" | "admin" | "vendor") => {
+    const credentials = 
+      type === "admin" ? DEMO_ADMIN_CREDENTIALS : 
+      type === "vendor" ? DEMO_VENDOR_CREDENTIALS : 
+      DEMO_USER_CREDENTIALS;
 
     if (!credentials.email || !credentials.password) {
       setError(
@@ -201,18 +209,25 @@ export default function LoginPage() {
               )}
             </button>
 
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
               <button
                 type="button"
                 onClick={() => fillDemoCredentials("user")}
-                className="rounded-[8px] border border-[#e0dbd3] bg-[#f9f8f6] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-[#777] hover:border-[#e8612e]/40 hover:text-[#e8612e] transition-colors"
+                className="rounded-[8px] border border-[#e0dbd3] bg-[#f9f8f6] px-2 py-2.5 text-[9px] font-bold uppercase tracking-[0.05em] text-[#777] hover:border-[#e8612e]/40 hover:text-[#e8612e] transition-colors"
               >
                 Demo User
               </button>
               <button
                 type="button"
+                onClick={() => fillDemoCredentials("vendor")}
+                className="rounded-[8px] border border-[#e0dbd3] bg-[#f9f8f6] px-2 py-2.5 text-[9px] font-bold uppercase tracking-[0.05em] text-[#777] hover:border-[#e8612e]/40 hover:text-[#e8612e] transition-colors"
+              >
+                Demo Vendor
+              </button>
+              <button
+                type="button"
                 onClick={() => fillDemoCredentials("admin")}
-                className="rounded-[8px] border border-[#e0dbd3] bg-[#f9f8f6] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-[#777] hover:border-[#e8612e]/40 hover:text-[#e8612e] transition-colors"
+                className="rounded-[8px] border border-[#e0dbd3] bg-[#f9f8f6] px-2 py-2.5 text-[9px] font-bold uppercase tracking-[0.05em] text-[#777] hover:border-[#e8612e]/40 hover:text-[#e8612e] transition-colors"
               >
                 Demo Admin
               </button>
