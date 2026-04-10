@@ -44,7 +44,6 @@ export default function CategoryFormModal({ onClose, onSuccess, initialData }: C
       onClose();
 
     } catch (err: any) {
-      console.error("Category Error:", err);
       toast.error(isEditMode ? "Update failed" : "Creation failed", {
         id: toastId,
         description: err.message
@@ -103,7 +102,7 @@ export default function CategoryFormModal({ onClose, onSuccess, initialData }: C
               placeholder="Brief description of this category..."
               className={`rounded-[7px] border px-3 py-2 text-sm text-[#111] outline-none transition-all ${validationErrors.description ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" : "border-[#e0dbd3] focus:border-[#e8612e] focus:ring-1 focus:ring-[#e8612e]"}`}
             ></textarea>
-             {validationErrors.description && (
+            {validationErrors.description && (
               <p className="text-[11px] font-medium text-red-500">{validationErrors.description[0]}</p>
             )}
           </div>

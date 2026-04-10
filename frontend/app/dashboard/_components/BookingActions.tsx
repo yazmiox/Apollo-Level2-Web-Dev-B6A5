@@ -25,7 +25,6 @@ export default function BookingActions({ bookingId, currentStatus }: BookingActi
             router.refresh();
         } catch (error: any) {
             toast.error(error.message || "Failed to update booking status");
-            console.error(error);
         } finally {
             setIsLoading(null);
         }

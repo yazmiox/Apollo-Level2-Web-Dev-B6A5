@@ -186,8 +186,6 @@ export default function EquipmentFormModal({ onClose, onSuccess, categories, ini
       onSuccess();
       onClose();
     } catch (err: any) {
-
-      console.error("Submission Error:", err);
       toast.error(isEditMode ? "Update failed" : "Addition failed", {
         id: toastId,
         description: err.message || "Something went wrong"

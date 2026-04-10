@@ -33,8 +33,6 @@ export const auth = betterAuth({
         enabled: true,
         requireEmailVerification: true,
         sendResetPassword: async ({ user, url, token }, request) => {
-            console.log(url)
-
             waitUntil(
                 sendEmail({
                     to: user.email,
@@ -47,8 +45,6 @@ export const auth = betterAuth({
     emailVerification: {
         sendVerificationEmail: async ({ user, url, token }, request) => {
             const verificationUrl = `${CLIENT_URL}/verify-email?token=${token}`
-            console.log(verificationUrl)
-
             waitUntil(
                 sendEmail({
                     to: user.email,

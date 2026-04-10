@@ -28,7 +28,6 @@ export default function CategoryActions({ category }: { category: Category }) {
       router.refresh();
 
     } catch (err: any) {
-      console.error("Delete Error:", err);
       toast.error(err.message || "Could not delete category", { id: toastId });
     } finally {
       setIsDeleting(false);

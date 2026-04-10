@@ -40,8 +40,6 @@ export default function RegisterPage() {
         setIsRegistering(false);
       }
     })
-
-    console.log('User Registered:', res)
   };
 
   const handleGoogleSignIn = async () => {
@@ -88,17 +86,16 @@ export default function RegisterPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              
+
               {/* Role Selection */}
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setRole("user")}
-                  className={`flex flex-col items-center gap-2 rounded-xl border p-3 pt-4 transition-all ${
-                    role === "user"
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-3 pt-4 transition-all ${role === "user"
                       ? "border-[#e8612e] bg-[#fdf5f2] ring-1 ring-[#e8612e]"
                       : "border-[#e0dbd3] bg-white hover:bg-[#f9f8f6]"
-                  }`}
+                    }`}
                 >
                   <UserIcon size={20} className={role === "user" ? "text-[#e8612e]" : "text-[#aaa]"} />
                   <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "user" ? "text-[#e8612e]" : "text-[#777]"}`}>
@@ -108,11 +105,10 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setRole("vendor")}
-                  className={`flex flex-col items-center gap-2 rounded-xl border p-3 pt-4 transition-all ${
-                    role === "vendor"
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-3 pt-4 transition-all ${role === "vendor"
                       ? "border-[#e8612e] bg-[#fdf5f2] ring-1 ring-[#e8612e]"
                       : "border-[#e0dbd3] bg-white hover:bg-[#f9f8f6]"
-                  }`}
+                    }`}
                 >
                   <Store size={20} className={role === "vendor" ? "text-[#e8612e]" : "text-[#aaa]"} />
                   <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "vendor" ? "text-[#e8612e]" : "text-[#777]"}`}>
