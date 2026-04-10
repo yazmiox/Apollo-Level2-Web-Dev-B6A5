@@ -44,7 +44,20 @@ export type Equipment = {
     specifications: any;
     categoryId: string;
     category?: Category;
+    vendorId: string;
+    vendor?: Vendor;
     isFeatured: boolean;
+}
+
+export type Vendor = {
+    id: string;
+    name: string;
+    email: string;
+    image?: string;
+    bio?: string;
+    listingsCount: number;
+    avgRating: number;
+    equipments?: Equipment[];
 }
 
 export interface CustomerStats {

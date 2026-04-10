@@ -48,6 +48,21 @@ export const getAllEquipments = async (params: EquipmentSearchParams = {}) => {
   }
 };
 
+export const getMyEquipments = async (params: { q?: string; page?: number; limit?: number } = {}) => {
+  try {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) searchParams.append(key, String(value));
+    });
+
+    const queryString = searchParams.toString();
+    const response = await httpClient.get<Equipment[]>(`/equipment/vendor/me${queryString ? `?${queryString}` : ""}`);
+    return response;
+  } catch (error: any) {
+    return { success: false, message: error?.message || "Something went wrong" };
+  }
+};
+
 export const getEquipmentBySlug = async (slug: string) => {
   try {
     const response = await httpClient.get(`/equipment/${slug}`);

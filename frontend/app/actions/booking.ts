@@ -35,6 +35,22 @@ export async function getAllBookings(params: { q?: string; status?: string } = {
     }
 }
 
+export async function getVendorBookings(params: { q?: string; status?: string } = {}) {
+    try {
+        const searchParams = new URLSearchParams();
+        if (params.q) searchParams.set("q", params.q);
+        if (params.status) searchParams.set("status", params.status);
+
+        const queryString = searchParams.toString();
+        const url = `/bookings/vendor/me${queryString ? `?${queryString}` : ""}`;
+
+        const res = await httpClient.get<Booking[]>(url)
+        return res
+    } catch (error: any) {
+        return { success: false, message: error?.message || "Something went wrong" };
+    }
+}
+
 export async function updateBookingStatus(bookingId: string, status: string) {
     try {
         const res = await httpClient.patch(`/bookings/${bookingId}/status`, { status })

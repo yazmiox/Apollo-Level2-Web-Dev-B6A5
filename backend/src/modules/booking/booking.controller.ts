@@ -35,6 +35,20 @@ export const getAllBookings = async (req: Request, res: Response, next: NextFunc
     }
 }
 
+// Vendor sees only bookings for their own equipment
+export const getVendorBookings = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const vendorId = req.user?.id;
+        if (!vendorId) throw new ApiError(401, "Unauthorized");
+
+        const { q, status } = req.query;
+        const bookings = await bookingService.getAllBookings({ vendorId, q: q as string, status: status as string });
+        res.status(200).json({ success: true, message: "Vendor bookings fetched successfully", data: bookings });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export const createBooking = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = (req as any).user?.id;
@@ -49,9 +63,10 @@ export const updateBookingStatus = async (req: Request, res: Response, next: Nex
     try {
         const { id } = req.params;
         const { status } = req.body;
-        const adminId = (req as any).user?.id;
+        const userId = (req as any).user?.id;
+        const role = (req as any).user?.role;
 
-        const booking = await bookingService.updateBookingStatus(id as string, status, adminId);
+        const booking = await bookingService.updateBookingStatus(id as string, status, userId, role);
         res.status(200).json({ success: true, message: "Booking status updated successfully", data: booking });
     } catch (error) {
         next(error);

@@ -1,5 +1,5 @@
 import { getSession } from "@/app/lib/auth-server";
-import { ArrowLeft, Star } from "lucide-react";
+import { ArrowLeft, Package, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -225,6 +225,43 @@ export default async function EquipmentDetailPage({ params }: Props) {
                   </div>
                 </div>
               </div>
+
+              {/* Vendor Profile Card */}
+              {equipment.vendor && (
+                <div className="mt-6 rounded-2xl border border-[#e0dbd3] bg-white p-6 shadow-sm">
+                  <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-[#aaa]">Listed by</h3>
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#f9f8f6] border border-[#f0ece5]">
+                      {equipment.vendor.image ? (
+                        <Image src={equipment.vendor.image} alt={equipment.vendor.name} fill className="object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xl font-bold text-[#e8612e]">
+                          {equipment.vendor.name.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-[#111] truncate">{equipment.vendor.name}</p>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-[#888]">
+                        <span className="flex items-center gap-1 font-bold text-amber-500">
+                          <Star size={12} className="fill-current" />
+                          {equipment.vendor.avgRating?.toFixed(1) || "5.0"}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Package size={12} />
+                          {equipment.vendor.listingsCount || 1} Listings
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/vendors/${equipment.vendor.id}`}
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-[#e0dbd3] bg-[#fdfdfc] py-2.5 text-xs font-bold text-[#111] transition-all hover:bg-[#f9f8f6] hover:border-[#aaa]"
+                  >
+                    View Storefront
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 

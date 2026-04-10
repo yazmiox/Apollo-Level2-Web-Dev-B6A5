@@ -1,7 +1,7 @@
 "use client";
 
 import { formatDateShort } from "@/app/utils";
-import { ArrowRight, Banknote, Box, Calendar, Check, ChevronRight, Clock, Loader2, UserCheck, X } from "lucide-react";
+import { ArrowRight, Banknote, Box, Calendar, Check, ChevronRight, Clock, Loader2, Package, UserCheck, Wrench, X, Store } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -21,8 +21,14 @@ type PendingRequest = {
 type AdminStats = {
   pendingApprovals: number;
   activeRentals: number;
-  customers: number;
-  monthlyRevenue: string;
+  totalEquipment?: number;
+  totalListings?: number;
+  activeListings?: number;
+  totalEarnings?: string;
+  maintenanceCount?: number;
+  customers?: number;
+  vendors?: number;
+  monthlyRevenue?: string;
   pendingRequests: PendingRequest[];
 };
 
@@ -33,9 +39,24 @@ const parseCurrencyToNumber = (value: string) => {
   return Number.isFinite(normalized) ? normalized : 0;
 };
 
-export default function AdminOverview({ stats }: { stats: AdminStats }) {
-  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>(stats.pendingRequests ?? []);
+export default function AdminOverview({ stats, role = "admin" }: { stats: any; role?: string }) {
+  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>(stats?.pendingRequests ?? []);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  if (!stats) {
+    return (
+      <div className="flex h-[400px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#e0dbd3] bg-white text-center p-8">
+        <div className="mb-4 rounded-full bg-red-50 p-4">
+          <Loader2 className="h-8 w-8 text-red-400 animate-spin" />
+        </div>
+        <h3 className="text-lg font-bold text-[#111]">Loading Dashboard Data...</h3>
+        <p className="mt-1 text-sm text-[#777]">If this persists, please try refreshing the page or check your connection.</p>
+      </div>
+    );
+  }
+
+  const isAdmin = role === "admin";
+  const isVendor = role === "vendor";
 
   const handleStatusChange = async (id: string, status: string) => {
     setLoadingId(id + "_" + status);
@@ -55,21 +76,32 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
     toast.success(`Booking ${status.toLowerCase().replace("_", " ")} successfully`);
   };
 
-  const statsArr = [
-    { label: "Pending Approvals", value: stats.pendingApprovals, icon: Clock, color: "text-amber-500", bg: "bg-amber-500/10" },
-    { label: "Active Rentals", value: stats.activeRentals, icon: Box, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { label: "Customers", value: stats.customers, icon: UserCheck, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { label: "Monthly Revenue", value: stats.monthlyRevenue, icon: Banknote, color: "text-green-500", bg: "bg-green-500/10" },
-  ];
+  // Admin stats vs Vendor stats
+  const statsArr = isAdmin
+    ? [
+        { label: "Pending Approvals", value: stats.pendingApprovals, icon: Clock, color: "text-amber-500", bg: "bg-amber-500/10" },
+        { label: "Active Rentals", value: stats.activeRentals, icon: Box, color: "text-blue-500", bg: "bg-blue-500/10" },
+        { label: "Vendors", value: stats.vendors ?? 0, icon: Store, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+        { label: "Monthly Revenue", value: stats.monthlyRevenue ?? "$0", icon: Banknote, color: "text-green-500", bg: "bg-green-500/10" },
+      ]
+    : [
+        { label: "My Pending Gear", value: stats.pendingApprovals ?? 0, icon: Clock, color: "text-amber-500", bg: "bg-amber-500/10" },
+        { label: "Active Rentals", value: stats.activeRentals ?? 0, icon: Box, color: "text-blue-500", bg: "bg-blue-500/10" },
+        { label: "Total Listings", value: stats.totalListings ?? 0, icon: Package, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+        { label: "Total Earnings", value: stats.totalEarnings ?? "$0", icon: Banknote, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+      ];
 
   const operationalBarData = useMemo(() => ([
-    { name: "Pending", value: stats.pendingApprovals },
-    { name: "Active", value: stats.activeRentals },
-    { name: "Customers", value: stats.customers },
-  ]), [stats.pendingApprovals, stats.activeRentals, stats.customers]);
+    { name: "Pending", value: stats.pendingApprovals || 0 },
+    { name: "Active", value: stats.activeRentals || 0 },
+    ...(isAdmin
+      ? [{ name: "Revenue", value: parseCurrencyToNumber(stats.monthlyRevenue || "0") }]
+      : [{ name: "Earnings", value: parseCurrencyToNumber(stats.totalEarnings || "0") }]
+    ),
+  ]), [stats.pendingApprovals, stats.activeRentals, stats.monthlyRevenue, stats.totalEarnings, isAdmin]);
 
   const requestAmountLineData = useMemo(() => {
-    const points = pendingRequests
+    const points = (pendingRequests || [])
       .slice(0, 6)
       .map((req) => ({
         label: formatDateShort(req.startDate),
@@ -81,7 +113,7 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
   }, [pendingRequests]);
 
   const requestStatusPieData = useMemo(() => {
-    const summary = pendingRequests.reduce(
+    const summary = (pendingRequests || []).reduce(
       (acc, req) => {
         if (req.status === "PENDING_APPROVAL") acc.pending += 1;
         else if (req.status === "REJECTED") acc.rejected += 1;
@@ -105,11 +137,23 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
-          System Overview
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
+            {isAdmin ? "System Overview" : "Vendor Dashboard"}
+          </h1>
+          <span className={`inline-flex items-center rounded-lg border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${
+            isAdmin
+              ? "border-amber-200 bg-amber-100 text-amber-700"
+              : "border-emerald-200 bg-emerald-100 text-emerald-700"
+          }`}>
+            {isAdmin ? "Admin" : "Vendor"}
+          </span>
+        </div>
         <p className="mt-1 text-sm text-[#777]">
-          Monitor your inventory, bookings, and revenue at a glance.
+          {isAdmin
+            ? "Monitor platform performance, vendors, and revenue."
+            : "Manage your equipment listings and track your earnings."
+          }
         </p>
       </div>
 
@@ -133,9 +177,9 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border border-[#e0dbd3] bg-white p-5 shadow-sm">
           <h2 className="text-sm font-bold text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
-            Operations Snapshot (Bar)
+            {isAdmin ? "Platform Snapshot" : "My Performance"}
           </h2>
-          <p className="mt-1 text-xs text-[#888]">Live counts from current system data.</p>
+          <p className="mt-1 text-xs text-[#888]">Live counts from the system.</p>
 
           <div className="mt-4 h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -146,9 +190,8 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
                 <Tooltip
                   cursor={{ fill: "#f8f5ef" }}
                   contentStyle={{ borderRadius: 10, border: "1px solid #e0dbd3", fontSize: 12 }}
-                  formatter={(value) => [Number(value).toLocaleString(), "Count"]}
                 />
-                <Bar dataKey="value" fill="#e8612e" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="value" fill={isAdmin ? "#e8612e" : "#10b981"} radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -156,9 +199,9 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
 
         <div className="rounded-2xl border border-[#e0dbd3] bg-white p-5 shadow-sm">
           <h2 className="text-sm font-bold text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
-            Request Value Trend (Line)
+            Booking Value Trend
           </h2>
-          <p className="mt-1 text-xs text-[#888]">Latest request amounts based on pending request feed.</p>
+          <p className="mt-1 text-xs text-[#888]">Latest request amounts.</p>
 
           <div className="mt-4 h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -168,14 +211,13 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
                 <YAxis tick={{ fontSize: 12, fill: "#777" }} axisLine={false} tickLine={false} />
                 <Tooltip
                   contentStyle={{ borderRadius: 10, border: "1px solid #e0dbd3", fontSize: 12 }}
-                  formatter={(value) => [`$${Number(value).toLocaleString()}`, "Amount"]}
                 />
                 <Line
                   type="monotone"
                   dataKey="amount"
                   stroke="#111111"
                   strokeWidth={2.5}
-                  dot={{ r: 3, fill: "#e8612e" }}
+                  dot={{ r: 3, fill: isAdmin ? "#e8612e" : "#10b981" }}
                   activeDot={{ r: 5 }}
                 />
               </LineChart>
@@ -185,16 +227,15 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
 
         <div className="rounded-2xl border border-[#e0dbd3] bg-white p-5 shadow-sm">
           <h2 className="text-sm font-bold text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
-            Action Queue Status (Pie)
+            Request Distribution
           </h2>
-          <p className="mt-1 text-xs text-[#888]">Updates instantly when you approve or reject requests.</p>
+          <p className="mt-1 text-xs text-[#888]">Current status of incoming requests.</p>
 
           <div className="mt-4 h-48">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Tooltip
                   contentStyle={{ borderRadius: 10, border: "1px solid #e0dbd3", fontSize: 12 }}
-                  formatter={(value, name) => [value, name]}
                 />
                 <Pie
                   data={requestStatusPieData}
@@ -234,9 +275,9 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
           <div className="border-b border-[#f0ece5] flex items-center justify-between px-6 py-5">
             <div>
               <h2 className="text-base font-bold text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
-                Action Required
+                {isAdmin ? "Action Required" : "My Pending Requests"}
               </h2>
-              <p className="text-xs text-[#888] mt-0.5">Booking requests awaiting your approval.</p>
+              <p className="text-xs text-[#888] mt-0.5">Bookings awaiting action.</p>
             </div>
             <Link href="/dashboard/bookings" className="text-xs font-bold text-[#e8612e] hover:underline">
               View All
@@ -265,24 +306,30 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {req.status === "PENDING_APPROVAL" ? (
-                      <>
-                        <button
-                          disabled={loadingId !== null}
-                          onClick={() => handleStatusChange(req.id, "REJECTED")}
-                          className="flex items-center gap-1.5 rounded-[6px] border border-[#e0dbd3] bg-white px-3 py-1.5 text-xs font-bold text-red-600 transition-all hover:bg-red-50 hover:border-red-200 active:scale-95 disabled:pointer-events-none disabled:opacity-75"
-                        >
-                          {loadingId === req.id + "_REJECTED" ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
-                          Reject
-                        </button>
-                        <button
-                          disabled={loadingId !== null}
-                          onClick={() => handleStatusChange(req.id, "AWAITING_PAYMENT")}
-                          className="flex items-center gap-1.5 rounded-[6px] bg-[#111] px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-[#333] active:scale-95 shadow-sm disabled:pointer-events-none disabled:opacity-75"
-                        >
-                          {loadingId === req.id + "_AWAITING_PAYMENT" ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                          Approve
-                        </button>
-                      </>
+                      (isAdmin || isVendor) ? (
+                        <>
+                          <button
+                            disabled={loadingId !== null}
+                            onClick={() => handleStatusChange(req.id, "REJECTED")}
+                            className="flex items-center gap-1.5 rounded-[6px] border border-[#e0dbd3] bg-white px-3 py-1.5 text-xs font-bold text-red-600 transition-all hover:bg-red-50 hover:border-red-200 active:scale-95 disabled:pointer-events-none disabled:opacity-75"
+                          >
+                            {loadingId === req.id + "_REJECTED" ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
+                            Reject
+                          </button>
+                          <button
+                            disabled={loadingId !== null}
+                            onClick={() => handleStatusChange(req.id, "AWAITING_PAYMENT")}
+                            className="flex items-center gap-1.5 rounded-[6px] bg-[#111] px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-[#333] active:scale-95 shadow-sm disabled:pointer-events-none disabled:opacity-75"
+                          >
+                            {loadingId === req.id + "_AWAITING_PAYMENT" ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                            Approve
+                          </button>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-600 border border-amber-100">
+                          <Clock size={14} /> Awaiting Approval
+                        </div>
+                      )
                     ) : req.status === "REJECTED" ? (
                       <div className="flex items-center gap-1.5 rounded-full bg-red-50/50 px-3 py-1 text-[11px] font-bold text-red-600 border border-red-100/50">
                         <X size={14} className="bg-red-600 text-white rounded-full p-0.5" /> Rejected
@@ -306,18 +353,29 @@ export default function AdminOverview({ stats }: { stats: AdminStats }) {
           <div className="flex flex-col gap-3">
             <Link href="/dashboard/inventory" className="group flex items-center justify-between rounded-xl border border-[#e0dbd3] bg-[#f9f8f6] p-4 hover:border-[#e8612e]/30 hover:bg-[#fdf5f2] transition-colors">
               <div>
-                <p className="text-sm font-bold text-[#111]">Inventory</p>
-                <p className="text-xs text-[#777]">Manage your inventory</p>
+                <p className="text-sm font-bold text-[#111]">{isAdmin ? "Inventory" : "My Listings"}</p>
+                <p className="text-xs text-[#777]">Manage equipment</p>
               </div>
               <ArrowRight size={16} className="text-[#aaa] group-hover:text-[#e8612e] group-hover:translate-x-1 transition-all" />
             </Link>
-            <Link href="/dashboard/users" className="group flex items-center justify-between rounded-xl border border-[#e0dbd3] bg-[#f9f8f6] p-4 hover:border-[#e8612e]/30 hover:bg-[#fdf5f2] transition-colors">
+            
+            <Link href="/dashboard/bookings" className="group flex items-center justify-between rounded-xl border border-[#e0dbd3] bg-[#f9f8f6] p-4 hover:border-[#e8612e]/30 hover:bg-[#fdf5f2] transition-colors">
               <div>
-                <p className="text-sm font-bold text-[#111]">Customers</p>
-                <p className="text-xs text-[#777]">Manage your customers</p>
+                <p className="text-sm font-bold text-[#111]">Bookings</p>
+                <p className="text-xs text-[#777]">{isAdmin ? "Review all platform bookings" : "Track rentals on my gear"}</p>
               </div>
               <ArrowRight size={16} className="text-[#aaa] group-hover:text-[#e8612e] group-hover:translate-x-1 transition-all" />
             </Link>
+
+            {isAdmin && (
+              <Link href="/dashboard/vendors" className="group flex items-center justify-between rounded-xl border border-[#e0dbd3] bg-[#f9f8f6] p-4 hover:border-[#e8612e]/30 hover:bg-[#fdf5f2] transition-colors">
+                <div>
+                  <p className="text-sm font-bold text-[#111]">Vendors</p>
+                  <p className="text-xs text-[#777]">Manage partner accounts</p>
+                </div>
+                <ArrowRight size={16} className="text-[#aaa] group-hover:text-[#e8612e] group-hover:translate-x-1 transition-all" />
+              </Link>
+            )}
           </div>
         </div>
       </div>

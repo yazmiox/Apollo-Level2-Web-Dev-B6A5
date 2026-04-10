@@ -14,6 +14,7 @@ import statsRoutes from "./modules/stats/stats.routes";
 import customerRoutes from "./modules/customer/customer.routes";
 import reviewRoutes from "./modules/review/review.routes";
 import aiRoutes from "./modules/ai/ai.routes";
+import vendorRoutes from "./modules/vendor/vendor.routes";
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use("/api/payment", authenticate, paymentRoutes);
 app.use("/api/customers", authenticate, customerRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/vendors", vendorRoutes);
 
 app.use(globalErrorHandler)
 

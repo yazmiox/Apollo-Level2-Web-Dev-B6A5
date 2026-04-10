@@ -20,6 +20,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const role = user?.role || "user"
 
+  const workspaceLabel =
+    role === "admin" ? "Admin Workspace" :
+    role === "manager" ? "Manager Workspace" :
+    "Personal Workspace";
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f4f1ed]">
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col lg:flex-row px-5 py-8 lg:px-8 gap-8">
@@ -33,7 +38,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
             <div className="mb-4 px-3 pb-4 border-b border-[#f0ece5]">
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#aaa]">
-                {role === "ADMIN" ? "Admin Workspace" : "Personal Workspace"}
+                {workspaceLabel}
               </p>
               <h2 className="mt-1 text-lg font-bold text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
                 Dashboard

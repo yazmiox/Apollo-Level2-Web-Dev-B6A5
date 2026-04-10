@@ -41,12 +41,13 @@ const calculateBookingAmount = (rentalRate: number, start: Date, end: Date) => {
     return rentalRate * durationDays;
 };
 
-export const getAllBookings = async (params: { q?: string; status?: string; userId?: string } = {}) => {
-    const { q, status, userId } = params;
+export const getAllBookings = async (params: { q?: string; status?: string; userId?: string; vendorId?: string } = {}) => {
+    const { q, status, userId, vendorId } = params;
 
     const where: any = {};
     if (userId) where.userId = userId;
     if (status) where.status = status;
+    if (vendorId) where.equipment = { vendorId };
     if (q) {
         where.OR = [
             { user: { name: { contains: q, mode: "insensitive" } } },
@@ -175,7 +176,7 @@ export const createBooking = async (userId: string, data: CreateBookingInput) =>
     });
 };
 
-export const updateBookingStatus = async (id: string, nextStatus: BookingStatus, adminId?: string) => {
+export const updateBookingStatus = async (id: string, nextStatus: BookingStatus, requesterId: string, role: string) => {
     const booking = await prisma.booking.findUnique({
         where: { id },
         include: {
@@ -186,6 +187,13 @@ export const updateBookingStatus = async (id: string, nextStatus: BookingStatus,
 
     if (!booking) {
         throw new ApiError(404, "Booking not found");
+    }
+
+    // Role-based authorization
+    if (role === "vendor") {
+        if (booking.equipment.vendorId !== requesterId) {
+            throw new ApiError(403, "You can only manage bookings for your own equipment");
+        }
     }
 
     const allowedStatuses = ALLOWED_STATUS_TRANSITIONS[booking.status];
@@ -202,11 +210,7 @@ export const updateBookingStatus = async (id: string, nextStatus: BookingStatus,
     };
 
     if (nextStatus === BookingStatus.AWAITING_PAYMENT) {
-        if (!adminId) {
-            throw new ApiError(401, "Unauthorized");
-        }
-
-        data.approvedByAdminId = adminId;
+        data.approvedByAdminId = requesterId;
         data.approvedAt = new Date();
 
         waitUntil(

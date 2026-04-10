@@ -11,8 +11,11 @@ router.get("/my", validateRole("user"), bookingController.getMyBookings);
 router.post("/availability", validateRole("user"), validateRequest(checkAvailabilitySchema), bookingController.checkAvailability);
 router.post("/", validateRole("user"), validateRequest(createBookingSchema), bookingController.createBooking);
 
-// Admin routes
+// Vendor routes — see bookings for their own equipment
+router.get("/vendor/me", validateRole("vendor"), bookingController.getVendorBookings);
+
+// Admin/Vendor routes — manage status
 router.get("/", validateRole("admin"), bookingController.getAllBookings);
-router.patch("/:id/status", validateRole("admin"), validateRequest(updateBookingStatusSchema), bookingController.updateBookingStatus);
+router.patch("/:id/status", validateRole("admin", "vendor"), validateRequest(updateBookingStatusSchema), bookingController.updateBookingStatus);
 
 export default router;

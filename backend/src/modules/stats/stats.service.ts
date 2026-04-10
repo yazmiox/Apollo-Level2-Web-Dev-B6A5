@@ -1,6 +1,7 @@
 import prisma from "../../lib/prisma";
 
 export const getStats = async (role: string, userId?: string) => {
+    // ── User Stats ──
     if (role === "user" && userId) {
         const [
             totalSpentData,
@@ -69,10 +70,82 @@ export const getStats = async (role: string, userId?: string) => {
             totalSpent: `$${Number(totalSpentData._sum.amount || 0).toLocaleString()}`,
         };
     }
+
+    // ── Vendor Stats ──
+    if (role === "vendor" && userId) {
+        const [
+            totalListings,
+            activeListings,
+            totalBookingsOnMyGear,
+            activeRentals,
+            pendingApprovals,
+            earningsData,
+            pendingRequests
+        ] = await Promise.all([
+            prisma.equipment.count({ where: { vendorId: userId } }),
+            prisma.equipment.count({ where: { vendorId: userId, status: "AVAILABLE" } }),
+            prisma.booking.count({
+                where: { equipment: { vendorId: userId } }
+            }),
+            prisma.booking.count({
+                where: {
+                    equipment: { vendorId: userId },
+                    status: { in: ["CONFIRMED", "ACTIVE"] }
+                }
+            }),
+            prisma.booking.count({
+                where: {
+                    equipment: { vendorId: userId },
+                    status: "PENDING_APPROVAL"
+                }
+            }),
+            prisma.payment.aggregate({
+                where: {
+                    status: "SUCCEEDED",
+                    booking: { equipment: { vendorId: userId } }
+                },
+                _sum: { amount: true }
+            }),
+            prisma.booking.findMany({
+                where: { 
+                    equipment: { vendorId: userId },
+                    status: "PENDING_APPROVAL" 
+                },
+                include: {
+                    user: { select: { name: true } },
+                    equipment: { select: { name: true } }
+                },
+                orderBy: { updatedAt: "desc" },
+                take: 5
+            })
+        ]);
+
+        return {
+            totalListings,
+            activeListings,
+            totalBookings: totalBookingsOnMyGear,
+            activeRentals,
+            pendingApprovals,
+            totalEarnings: `$${Number(earningsData._sum.amount || 0).toLocaleString()}`,
+            pendingRequests: (pendingRequests as any[]).map(req => ({
+                id: req.id,
+                user: { name: req.user.name },
+                equipment: { name: req.equipment.name },
+                startDate: req.startDate.toISOString(),
+                endDate: req.endDate.toISOString(),
+                amount: `$${Number(req.amount).toLocaleString()}`,
+                status: req.status
+            }))
+        };
+    }
+
+    // ── Admin Stats ──
     const [
         pendingApprovals,
         activeRentals,
         customersCount,
+        vendorsCount,
+        totalEquipment,
         monthlyRevenueData,
         pendingRequests
     ] = await Promise.all([
@@ -82,9 +155,9 @@ export const getStats = async (role: string, userId?: string) => {
         prisma.booking.count({
             where: { status: { in: ["CONFIRMED", "ACTIVE"] } }
         }),
-        prisma.booking.groupBy({
-            by: ["userId"],
-        }).then(groups => groups.length),
+        prisma.user.count({ where: { role: "user" } }),
+        prisma.user.count({ where: { role: "vendor" } }),
+        prisma.equipment.count(),
         prisma.payment.aggregate({
             where: {
                 status: "SUCCEEDED",
@@ -109,6 +182,8 @@ export const getStats = async (role: string, userId?: string) => {
         pendingApprovals,
         activeRentals,
         customers: customersCount,
+        vendors: vendorsCount,
+        totalEquipment,
         monthlyRevenue: `$${Number(monthlyRevenueData._sum.amount || 0).toLocaleString()}`,
         pendingRequests: pendingRequests.map(req => ({
             id: req.id,

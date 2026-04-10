@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, User as UserIcon, Store } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,6 +12,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"user" | "vendor">("user");
   const [error, setError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const [isGoogleLoggingIn, setIsGoogleLoggingIn] = useState(false);
@@ -22,7 +23,9 @@ export default function RegisterPage() {
     const res = await authClient.signUp.email({
       name,
       email,
-      password
+      password,
+      // @ts-ignore - role is an additional field
+      role,
     }, {
       onRequest: () => {
         setError(null)
@@ -64,27 +67,59 @@ export default function RegisterPage() {
       <main className="flex flex-1 items-center justify-center px-5 py-24 lg:px-8">
         <div className="w-full max-w-md animate-in slide-in-from-bottom-8 fade-in duration-500">
 
-          <div className="mb-10 flex justify-center">
+          <div className="mb-8 flex justify-center">
             <Logo size="lg" />
           </div>
 
           <div className="rounded-3xl border border-[#e0dbd3] bg-white p-8 shadow-sm sm:p-10">
-            <div className="mb-8 text-center">
+            <div className="mb-6 text-center">
               <h1 className="text-3xl font-extrabold tracking-tight text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
-                Create an account
+                Get Started
               </h1>
               <p className="mt-1.5 text-sm text-[#777]">
-                Join EquipFlow to start renting premium gear.
+                Create your account to start your journey.
               </p>
             </div>
+
             {error && (
-              <div className="text-center">
-                <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-medium text-red-600 ring-1 ring-inset ring-red-600/10">
-                  {error}
-                </div>
+              <div className="mb-6 rounded-lg bg-red-50 p-3 text-sm font-medium text-red-600 ring-1 ring-inset ring-red-600/10">
+                {error}
               </div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-4">
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              
+              {/* Role Selection */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole("user")}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-3 pt-4 transition-all ${
+                    role === "user"
+                      ? "border-[#e8612e] bg-[#fdf5f2] ring-1 ring-[#e8612e]"
+                      : "border-[#e0dbd3] bg-white hover:bg-[#f9f8f6]"
+                  }`}
+                >
+                  <UserIcon size={20} className={role === "user" ? "text-[#e8612e]" : "text-[#aaa]"} />
+                  <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "user" ? "text-[#e8612e]" : "text-[#777]"}`}>
+                    Renter
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("vendor")}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-3 pt-4 transition-all ${
+                    role === "vendor"
+                      ? "border-[#e8612e] bg-[#fdf5f2] ring-1 ring-[#e8612e]"
+                      : "border-[#e0dbd3] bg-white hover:bg-[#f9f8f6]"
+                  }`}
+                >
+                  <Store size={20} className={role === "vendor" ? "text-[#e8612e]" : "text-[#aaa]"} />
+                  <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "vendor" ? "text-[#e8612e]" : "text-[#777]"}`}>
+                    Vendor
+                  </span>
+                </button>
+              </div>
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-[#555]">
@@ -157,9 +192,9 @@ export default function RegisterPage() {
               </button>
             </form>
 
-            <div className="mt-6 flex items-center gap-4">
+            <div className="mt-8 flex items-center gap-4">
               <div className="h-px flex-1 bg-[#f0ece5]" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#aaa]">or continue with</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#aaa]">or sign up with</span>
               <div className="h-px flex-1 bg-[#f0ece5]" />
             </div>
 
@@ -181,12 +216,12 @@ export default function RegisterPage() {
                     <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                   </svg>
-                  Sign up with Google
+                  Google
                 </>
               )}
             </button>
 
-            <p className="mt-6 text-center text-sm text-[#777]">
+            <p className="mt-8 text-center text-sm text-[#777]">
               Already have an account?{" "}
               <Link href="/login" className="font-bold text-[#e8612e] hover:underline transition-colors">
                 Sign in

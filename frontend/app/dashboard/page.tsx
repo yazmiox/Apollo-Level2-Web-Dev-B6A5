@@ -14,8 +14,8 @@ export default async function DashboardPage() {
   const stats = statsRes.data;
   const user = session.user;
 
-  if (user.role === "admin") {
-    return <AdminOverview stats={stats} />;
+  if (user.role === "admin" || user.role === "vendor") {
+    return <AdminOverview stats={stats} role={user.role} />;
   }
 
   return <UserOverview stats={stats} username={user.name!} />;

@@ -30,8 +30,9 @@ export default function NavbarClient({ authArea, mobileAuthArea }: NavbarClientP
   
   const navLinks = [
     { label: "Equipment", href: "/equipment" },
+    { label: "Vendors", href: "/vendors" },
     { label: "How It Works", href: "/#how-it-works" },
-    { label: "Why EquipFlow", href: "/#benefits" },
+    { label: "Why Apollo", href: "/#benefits" },
   ];
 
   return (

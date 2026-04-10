@@ -16,13 +16,14 @@ export const getAllEquipments = async (params: {
     sort?: string,
     page?: number | string,
     limit?: number | string,
-    isFeatured?: boolean
+    isFeatured?: boolean,
+    vendorId?: string,
 } = {}) => {
     const pageNum = Number(params.page) || 1;
     const limitNum = Number(params.limit) || 9;
     const skip = (pageNum - 1) * limitNum;
 
-    const { q, category, status, sort, isFeatured } = params;
+    const { q, category, status, sort, isFeatured, vendorId } = params;
 
     const where: EquipmentWhereInput = {};
 
@@ -35,6 +36,10 @@ export const getAllEquipments = async (params: {
 
     if (isFeatured) {
         where.isFeatured = isFeatured;
+    }
+
+    if (vendorId) {
+        where.vendorId = vendorId;
     }
 
     if (category && category !== "all") {
@@ -57,6 +62,7 @@ export const getAllEquipments = async (params: {
             where,
             include: {
                 category: true,
+                vendor: { select: { id: true, name: true, image: true } },
                 _count: { select: { reviews: true } }
             },
             orderBy,
@@ -99,6 +105,7 @@ export const getEquipmentBySlug = async (slug: string) => {
         where: { slug },
         include: {
             category: true,
+            vendor: { select: { id: true, name: true, image: true, createdAt: true } },
             _count: {
                 select: { reviews: true }
             }
@@ -107,6 +114,14 @@ export const getEquipmentBySlug = async (slug: string) => {
 
     if (!equipment) {
         throw new ApiError(404, "Equipment not found");
+    }
+
+    // Get vendor's listing count if equipment has a vendor
+    let vendorListingCount = 0;
+    if (equipment.vendorId) {
+        vendorListingCount = await prisma.equipment.count({
+            where: { vendorId: equipment.vendorId }
+        });
     }
 
     const [ratingAggregate, reviews, equipmentImageUrl, relatedEquipments] = await Promise.all([
@@ -143,7 +158,8 @@ export const getEquipmentBySlug = async (slug: string) => {
         rating: ratingAggregate._avg.rating || 0,
         reviewCount: equipment._count.reviews,
         reviews,
-        related: relatedWithUrls
+        related: relatedWithUrls,
+        vendorListingCount,
     };
 }
 
@@ -176,7 +192,7 @@ export const createEquipmentImageUpload = async (data: CreateEquipmentImageUploa
     return { key, uploadUrl };
 };
 
-export const createEquipment = async (data: CreateEquipmentInput) => {
+export const createEquipment = async (data: CreateEquipmentInput & { vendorId?: string | null }) => {
     const category = await prisma.category.findUnique({ where: { id: data.categoryId } });
     if (!category) {
         throw new ApiError(400, "Invalid Category ID");
@@ -209,4 +225,15 @@ export const deleteEquipment = async (id: string) => {
         throw new ApiError(404, "Equipment not found");
     }
     await prisma.equipment.delete({ where: { id } });
+}
+
+/** Ensures a vendor owns the given equipment. Throws 403 if not. */
+export const ensureVendorOwnership = async (equipmentId: string, vendorId: string) => {
+    const equipment = await prisma.equipment.findUnique({ where: { id: equipmentId } });
+    if (!equipment) {
+        throw new ApiError(404, "Equipment not found");
+    }
+    if (equipment.vendorId !== vendorId) {
+        throw new ApiError(403, "You can only manage your own equipment");
+    }
 }

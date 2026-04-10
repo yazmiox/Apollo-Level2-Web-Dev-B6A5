@@ -40,20 +40,21 @@ enum PaymentStatus {
 }
 
 model User {
-  id               String    @id
+  id               String      @id
   name             String
   email            String
-  emailVerified    Boolean   @default(false)
+  emailVerified    Boolean     @default(false)
   image            String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  role             String    @default("user")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  role             String      @default("user")
   sessions         Session[]
   accounts         Account[]
-  bookings         Booking[] @relation("UserBookings")
-  approvedBookings Booking[] @relation("ApprovedBookings")
-  payments         Payment[] @relation("UserPayments")
+  bookings         Booking[]   @relation("UserBookings")
+  approvedBookings Booking[]   @relation("ApprovedBookings")
+  payments         Payment[]   @relation("UserPayments")
   reviews          Review[]
+  vendorEquipments Equipment[] @relation("VendorEquipments")
 
   @@unique([email])
   @@map("user")
@@ -124,6 +125,8 @@ model Equipment {
   description    String
   categoryId     String
   category       Category           @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  vendorId       String?
+  vendor         User?              @relation("VendorEquipments", fields: [vendorId], references: [id], onDelete: SetNull)
   brand          String
   modelName      String
   location       String
@@ -141,6 +144,7 @@ model Equipment {
 
   @@index([categoryId])
   @@index([status])
+  @@index([vendorId])
 }
 
 model Booking {

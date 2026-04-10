@@ -1,10 +1,12 @@
 import { getAllCategories } from "@/app/actions/category";
-import { getAllEquipments } from "@/app/actions/equipment";
+import { getAllEquipments, getMyEquipments } from "@/app/actions/equipment";
 import SearchBox from "../_components/SearchBox";
 import InventoryAddAction from "./_components/InventoryAddAction";
 import EquipmentActions from "./_components/EquipmentActions";
 import Pagination from "../../equipment/_components/Pagination";
 import Image from "next/image";
+import { getSession } from "../../lib/auth-server";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -21,13 +23,22 @@ export default async function AdminInventoryPage({
 }: {
   searchParams: Promise<{ q?: string; page?: string }>;
 }) {
+  const session = await getSession();
+  if (!session || (session.user.role !== "admin" && session.user.role !== "vendor")) {
+    redirect("/login");
+  }
+
+  const role = session.user.role;
+  const isAdmin = role === "admin";
   const params = await searchParams;
   const searchQuery = params.q || "";
   const page = Number(params.page) || 1;
 
   const [categoriesRes, equipmentsRes] = await Promise.all([
     getAllCategories(),
-    getAllEquipments({ q: searchQuery, page, limit: 10 })
+    role === "admin" 
+      ? getAllEquipments({ q: searchQuery, page, limit: 10 })
+      : getMyEquipments({ q: searchQuery, page, limit: 10 })
   ]);
 
   const categories = categoriesRes.data || [];
@@ -40,10 +51,12 @@ export default async function AdminInventoryPage({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
-            Inventory Management
+            {isAdmin ? "System Inventory" : "My Listings"}
           </h1>
           <p className="mt-1 text-sm text-[#777]">
-            Add, update, or remove equipment from your catalog.
+            {isAdmin 
+              ? "Oversee all equipment listings across the platform." 
+              : "Manage the equipment you've listed for rent."}
           </p>
         </div>
       </div>
@@ -63,6 +76,7 @@ export default async function AdminInventoryPage({
                 <th className="px-6 py-4">Image</th>
                 <th className="px-6 py-4">Equipment Name</th>
                 <th className="px-6 py-4">Category</th>
+                {isAdmin && <th className="px-6 py-4">Vendor</th>}
                 <th className="px-6 py-4">Condition</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-right">Actions</th>
@@ -71,7 +85,7 @@ export default async function AdminInventoryPage({
             <tbody className="divide-y divide-[#f0ece5]">
               {equipments.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-20 text-center text-sm font-semibold text-[#555]">
+                  <td colSpan={isAdmin ? 7 : 6} className="py-20 text-center text-sm font-semibold text-[#555]">
                     No equipment found matching search query.
                   </td>
                 </tr>
@@ -93,6 +107,16 @@ export default async function AdminInventoryPage({
                     </td>
                     <td className="px-6 py-4 font-bold text-[#111]">{item.name}</td>
                     <td className="px-6 py-4">{item.category?.name || "Uncategorized"}</td>
+                    {isAdmin && (
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                           {item.vendor?.image && (
+                             <Image src={item.vendor.image} alt={item.vendor.name} width={20} height={20} className="rounded-full shrink-0" />
+                           )}
+                           <span className="truncate max-w-[120px] font-medium text-stone-900">{item.vendor?.name || "Admin"}</span>
+                        </div>
+                      </td>
+                    )}
                     <td className="px-6 py-4 font-medium text-[#111]">
                       {CONDITION_LABELS[item.condition] ?? item.condition}
                     </td>

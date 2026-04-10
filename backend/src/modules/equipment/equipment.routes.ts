@@ -11,10 +11,13 @@ const router = Router();
 router.get("/", equipmentController.getAllEquipments);
 router.get("/:slug", equipmentController.getEquipment);
 
-// Protected routes (Admin only)
-router.post("/upload-url", authenticate, validateRole("admin"), validateRequest(createEquipmentImageUploadSchema), equipmentController.createEquipmentImageUploadUrl);
-router.post("/", authenticate, validateRole("admin"), validateRequest(createEquipmentSchema), equipmentController.createEquipment);
-router.patch("/:id", authenticate, validateRole("admin"), validateRequest(updateEquipmentSchema), equipmentController.updateEquipment);
-router.delete("/:id", authenticate, validateRole("admin"), equipmentController.deleteEquipment);
+// Vendor routes — manage own equipment
+router.get("/vendor/me", authenticate, validateRole("vendor"), equipmentController.getMyEquipments);
+
+// Protected routes (Admin & Vendor can manage equipment)
+router.post("/upload-url", authenticate, validateRole("admin", "vendor"), validateRequest(createEquipmentImageUploadSchema), equipmentController.createEquipmentImageUploadUrl);
+router.post("/", authenticate, validateRole("admin", "vendor"), validateRequest(createEquipmentSchema), equipmentController.createEquipment);
+router.patch("/:id", authenticate, validateRole("admin", "vendor"), validateRequest(updateEquipmentSchema), equipmentController.updateEquipment);
+router.delete("/:id", authenticate, validateRole("admin", "vendor"), equipmentController.deleteEquipment);
 
 export default router;

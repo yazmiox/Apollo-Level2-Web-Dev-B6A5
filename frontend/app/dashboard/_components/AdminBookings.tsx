@@ -5,7 +5,16 @@ import Image from "next/image";
 import BookingActions from "./BookingActions";
 import SearchBox from "./SearchBox";
 
-export default function AdminBookings({ initialBookings }: { initialBookings: Booking[] }) {
+export default function AdminBookings({ 
+  initialBookings, 
+  role = "admin" 
+}: { 
+  initialBookings: Booking[], 
+  role?: "admin" | "vendor" 
+}) {
+  const isAdmin = role === "admin";
+  const isVendor = role === "vendor";
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "PENDING_APPROVAL":
@@ -33,10 +42,13 @@ export default function AdminBookings({ initialBookings }: { initialBookings: Bo
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-[#111]" style={{ fontFamily: "var(--font-display)" }}>
-            Booking Approvals
+            {isAdmin ? "Booking Approvals" : "My Received Bookings"}
           </h1>
           <p className="mt-1 text-sm text-[#777]">
-            Review, approve, or reject incoming rental requests.
+            {isAdmin 
+              ? "Review, approve, or reject incoming rental requests across the platform."
+              : "Manage rental requests for your equipment listings."
+            }
           </p>
         </div>
       </div>
@@ -59,13 +71,13 @@ export default function AdminBookings({ initialBookings }: { initialBookings: Bo
                 <th className="px-6 py-4">Rental Period</th>
                 <th className="px-6 py-4 text-right">Amount</th>
                 <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                {(isAdmin || isVendor) && <th className="px-6 py-4 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f0ece5] text-[13px] text-[#444]">
               {initialBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-24 text-center">
+                  <td colSpan={isAdmin ? 6 : 5} className="py-24 text-center">
                     <p className="text-sm font-semibold text-[#555]">No bookings found.</p>
                   </td>
                 </tr>
@@ -100,9 +112,11 @@ export default function AdminBookings({ initialBookings }: { initialBookings: Bo
                     <td className="px-6 py-4">
                       {getStatusBadge(req.status)}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <BookingActions role={req.user.role} bookingId={req.id} currentStatus={req.status} />
-                    </td>
+                    {(isAdmin || isVendor) && (
+                      <td className="px-6 py-4 text-right">
+                        <BookingActions bookingId={req.id} currentStatus={req.status} />
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

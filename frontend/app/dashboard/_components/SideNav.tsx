@@ -1,10 +1,38 @@
 "use client"
 
 import { authClient } from "@/app/lib/auth-client";
-import { CalendarDays, FolderKanban, LayoutDashboard, LogOut, Settings, Users, Tags } from "lucide-react";
+import { CalendarDays, FolderKanban, LayoutDashboard, LogOut, Package, Settings, Shield, Store, Tags, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
+
+const ROLE_BADGE: Record<string, { label: string; color: string; bg: string }> = {
+    admin: { label: "Admin", color: "text-amber-700", bg: "bg-amber-100 border-amber-200" },
+    vendor: { label: "Vendor", color: "text-emerald-700", bg: "bg-emerald-100 border-emerald-200" },
+};
+
+const USER_NAV = [
+    { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+    { label: "My Bookings", href: "/dashboard/bookings", icon: CalendarDays },
+    { label: "Settings", href: "/dashboard/settings", icon: Settings },
+];
+
+const VENDOR_NAV = [
+    { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+    { label: "My Listings", href: "/dashboard/inventory", icon: Package },
+    { label: "My Bookings", href: "/dashboard/bookings", icon: CalendarDays },
+    { label: "Settings", href: "/dashboard/settings", icon: Settings },
+];
+
+const ADMIN_NAV = [
+    { label: "System Overview", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Inventory", href: "/dashboard/inventory", icon: FolderKanban },
+    { label: "Categories", href: "/dashboard/categories", icon: Tags },
+    { label: "Bookings", href: "/dashboard/bookings", icon: CalendarDays },
+    { label: "Vendors", href: "/dashboard/vendors", icon: Store },
+    { label: "Customers", href: "/dashboard/users", icon: Users },
+    { label: "Settings", href: "/dashboard/settings", icon: Settings },
+];
 
 export default function SideNav({ role }: { role: string }) {
     const pathname = usePathname();
@@ -14,18 +42,12 @@ export default function SideNav({ role }: { role: string }) {
     const user = data?.user;
     const initials = user?.name?.split(" ").map((n) => n[0]).join("").toUpperCase() || "EF";
 
-    const NAV_ITEMS = role === "user" ? [
-        { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-        { label: "My Bookings", href: "/dashboard/bookings", icon: CalendarDays },
-        { label: "Settings", href: "/dashboard/settings", icon: Settings },
-    ] : [
-        { label: "System Overview", href: "/dashboard", icon: LayoutDashboard },
-        { label: "Manage Inventory", href: "/dashboard/inventory", icon: FolderKanban },
-        { label: "Manage Categories", href: "/dashboard/categories", icon: Tags },
-        { label: "Booking Approvals", href: "/dashboard/bookings", icon: CalendarDays },
-        { label: "Customers", href: "/dashboard/users", icon: Users },
-        { label: "Settings", href: "/dashboard/settings", icon: Settings },
-    ];
+    const NAV_ITEMS =
+        role === "admin" ? ADMIN_NAV :
+        role === "vendor" ? VENDOR_NAV :
+        USER_NAV;
+
+    const badge = ROLE_BADGE[role];
 
     const signOut = async () => {
         startTransition(async () => {
@@ -66,7 +88,15 @@ export default function SideNav({ role }: { role: string }) {
                         {initials}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="truncate text-sm font-bold text-[#111]">{user.name}</p>
+                        <div className="flex items-center gap-2">
+                            <p className="truncate text-sm font-bold text-[#111]">{user.name}</p>
+                            {badge && (
+                                <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${badge.bg} ${badge.color}`}>
+                                    <Shield size={10} />
+                                    {badge.label}
+                                </span>
+                            )}
+                        </div>
                         <p className="truncate text-xs text-[#777]">{user.email}</p>
                     </div>
                 </div>
