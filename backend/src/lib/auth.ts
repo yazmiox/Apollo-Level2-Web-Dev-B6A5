@@ -56,11 +56,11 @@ export const auth = betterAuth({
         sendOnSignUp: true,
         autoSignInAfterVerification: true
     },
-    advanced: {
-        crossSubDomainCookies: {
-            enabled: true,
-            domain: "vercel.app",
-        }
-    },
+    // advanced: {
+    //     crossSubDomainCookies: {
+    //         enabled: true,
+    //         domain: "vercel.app",
+    //     }
+    // },
     trustedOrigins: [CLIENT_URL!],
 })
