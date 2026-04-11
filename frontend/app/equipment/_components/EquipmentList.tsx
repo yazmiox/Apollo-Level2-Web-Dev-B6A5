@@ -89,12 +89,29 @@ export default async function EquipmentList({ searchParams }: { searchParams: { 
 
                                 <Link href={`/equipment/${item.slug}`}>
                                     <h2
-                                        className="mb-2 text-base font-bold text-[#111] hover:text-[#e8612e] transition-colors"
+                                        className="mb-1 text-base font-bold text-[#111] hover:text-[#e8612e] transition-colors"
                                         style={{ fontFamily: "var(--font-display)" }}
                                     >
                                         {item.name}
                                     </h2>
                                 </Link>
+
+                                {item.vendor && (
+                                    <div className="mb-3 flex items-center gap-1.5 overflow-hidden">
+                                        <div className="relative h-4 w-4 shrink-0 overflow-hidden rounded-full bg-[#f4f1ed]">
+                                            {item.vendor.image ? (
+                                                <Image src={item.vendor.image} alt={item.vendor.name} fill className="object-cover" />
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center bg-amber-100 text-[8px] font-bold text-amber-600">
+                                                    {item.vendor.name.charAt(0)}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <p className="truncate text-[10px] font-medium text-[#888]">
+                                            by <span className="text-[#555]">{item.vendor.name}</span>
+                                        </p>
+                                    </div>
+                                )}
 
                                 <p className="mb-4 flex-1 text-sm leading-relaxed text-[#777] line-clamp-2">
                                     {item.description}

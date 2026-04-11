@@ -32,10 +32,10 @@ export default function LoginPage() {
   const router = useRouter();
 
   const fillDemoCredentials = (type: "user" | "admin" | "vendor") => {
-    const credentials = 
-      type === "admin" ? DEMO_ADMIN_CREDENTIALS : 
-      type === "vendor" ? DEMO_VENDOR_CREDENTIALS : 
-      DEMO_USER_CREDENTIALS;
+    const credentials =
+      type === "admin" ? DEMO_ADMIN_CREDENTIALS :
+        type === "vendor" ? DEMO_VENDOR_CREDENTIALS :
+          DEMO_USER_CREDENTIALS;
 
     if (!credentials.email || !credentials.password) {
       setError(
@@ -60,6 +60,7 @@ export default function LoginPage() {
         setIsLoggingIn(true);
       },
       onSuccess: () => {
+        console.log("Login Success");
         router.push('/dashboard')
         setIsLoggingIn(false);
       },
