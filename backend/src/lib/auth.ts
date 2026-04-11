@@ -19,8 +19,9 @@ export const auth = betterAuth({
     user: {
         additionalFields: {
             role: {
-                type: "string",
+                type: ["admin", "vendor", "user"],
                 defaultValue: "user",
+                required: true,
                 input: true
             }
         }
@@ -29,6 +30,7 @@ export const auth = betterAuth({
         enabled: true,
         requireEmailVerification: true,
         sendResetPassword: async ({ user, url, token }, request) => {
+            console.log("Reset Password Email ", user, url, token)
             waitUntil(
                 sendEmail({
                     to: user.email,
@@ -41,6 +43,7 @@ export const auth = betterAuth({
     emailVerification: {
         sendVerificationEmail: async ({ user, url, token }, request) => {
             const verificationUrl = `${CLIENT_URL}/verify-email?token=${token}`
+            console.log("Verification Email ", user, url, token)
             waitUntil(
                 sendEmail({
                     to: user.email,
