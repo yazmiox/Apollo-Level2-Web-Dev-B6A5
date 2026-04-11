@@ -75,23 +75,23 @@ export default function LoginPage() {
     })
   };
 
-  // const handleGoogleSignIn = async () => {
-  //   await authClient.signIn.social({
-  //     provider: "google",
-  //     callbackURL: process.env.NEXT_PUBLIC_APP_URL + "/dashboard"
-  //   }, {
-  //     onRequest: () => {
-  //       setIsGoogleLoggingIn(true);
-  //     },
-  //     onSuccess: () => {
-  //       setIsGoogleLoggingIn(false);
-  //     },
-  //     onError: (ctx) => {
-  //       setError(ctx.error.message);
-  //       setIsGoogleLoggingIn(false);
-  //     }
-  //   })
-  // };
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: process.env.NEXT_PUBLIC_APP_URL + "/dashboard"
+    }, {
+      onRequest: () => {
+        setIsGoogleLoggingIn(true);
+      },
+      onSuccess: () => {
+        setIsGoogleLoggingIn(false);
+      },
+      onError: (ctx) => {
+        setError(ctx.error.message);
+        setIsGoogleLoggingIn(false);
+      }
+    })
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f4f1ed]">
@@ -181,7 +181,7 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* <div className="mt-6 flex items-center gap-4">
+            <div className="mt-6 flex items-center gap-4">
               <div className="h-px flex-1 bg-[#f0ece5]" />
               <span className="text-xs font-semibold uppercase tracking-wider text-[#aaa]">or continue with</span>
               <div className="h-px flex-1 bg-[#f0ece5]" />
@@ -208,7 +208,7 @@ export default function LoginPage() {
                   Sign in with Google
                 </>
               )}
-            </button> */}
+            </button>
 
             <div className="mt-4 grid gap-2 sm:grid-cols-3">
               <button

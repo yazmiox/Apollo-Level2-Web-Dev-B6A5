@@ -42,23 +42,23 @@ export default function RegisterPage() {
     })
   };
 
-  // const handleGoogleSignIn = async () => {
-  //   await authClient.signIn.social({
-  //     provider: "google",
-  //     callbackURL: process.env.NEXT_PUBLIC_APP_URL + "/dashboard"
-  //   }, {
-  //     onRequest: () => {
-  //       setIsGoogleLoggingIn(true);
-  //     },
-  //     onSuccess: () => {
-  //       setIsGoogleLoggingIn(false);
-  //     },
-  //     onError: (ctx) => {
-  //       setError(ctx.error.message);
-  //       setIsGoogleLoggingIn(false);
-  //     }
-  //   })
-  // };
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: process.env.NEXT_PUBLIC_APP_URL + "/dashboard"
+    }, {
+      onRequest: () => {
+        setIsGoogleLoggingIn(true);
+      },
+      onSuccess: () => {
+        setIsGoogleLoggingIn(false);
+      },
+      onError: (ctx) => {
+        setError(ctx.error.message);
+        setIsGoogleLoggingIn(false);
+      }
+    })
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f4f1ed]">
@@ -188,7 +188,7 @@ export default function RegisterPage() {
               </button>
             </form>
 
-            {/* <div className="mt-8 flex items-center gap-4">
+            <div className="mt-8 flex items-center gap-4">
               <div className="h-px flex-1 bg-[#f0ece5]" />
               <span className="text-xs font-semibold uppercase tracking-wider text-[#aaa]">or sign up with</span>
               <div className="h-px flex-1 bg-[#f0ece5]" />
@@ -215,7 +215,7 @@ export default function RegisterPage() {
                   Google
                 </>
               )}
-            </button> */}
+            </button>
 
             <p className="mt-8 text-center text-sm text-[#777]">
               Already have an account?{" "}
