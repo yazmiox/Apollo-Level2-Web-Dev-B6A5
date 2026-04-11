@@ -58,7 +58,8 @@ export const auth = betterAuth({
     },
     advanced: {
         crossSubDomainCookies: {
-            enabled: true
+            enabled: true,
+            domain: "vercel.app",
         }
     },
     trustedOrigins: [CLIENT_URL!],
