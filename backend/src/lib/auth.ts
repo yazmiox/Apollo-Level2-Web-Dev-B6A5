@@ -56,5 +56,10 @@ export const auth = betterAuth({
         sendOnSignUp: true,
         autoSignInAfterVerification: true
     },
+    advanced: {
+        crossSubDomainCookies: {
+            enabled: true
+        }
+    },
     trustedOrigins: [CLIENT_URL!],
 })
