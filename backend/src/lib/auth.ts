@@ -57,20 +57,15 @@ export const auth = betterAuth({
         autoSignInAfterVerification: true
     },
     advanced: {
-        defaultCookieAttributes: {
-            ...(process.env.NODE_ENV === "production"
-                ? {
-                    sameSite: "none" as const,
+        cookies: {
+            state: {
+                attributes: {
+                    sameSite: "none",
                     secure: true,
                     httpOnly: true,
                     path: "/",
                 }
-                : {
-                    sameSite: "lax" as const,
-                    secure: false,
-                    httpOnly: true,
-                    path: "/",
-                })
+            }
         }
     },
     trustedOrigins: [CLIENT_URL!],
