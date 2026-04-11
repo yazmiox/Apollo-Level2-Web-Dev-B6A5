@@ -218,8 +218,6 @@ export const updateBookingStatus = async (id: string, nextStatus: BookingStatus,
                 to: booking.user.email,
                 subject: "Booking Approved",
                 text: `Your booking for ${booking.equipment?.name} has been approved. Please proceed to payment.`,
-            }).catch(err => {
-                console.error("Failed to send approval email:", err);
             })
         );
     }

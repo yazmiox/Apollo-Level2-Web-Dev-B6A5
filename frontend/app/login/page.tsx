@@ -60,7 +60,6 @@ export default function LoginPage() {
         setIsLoggingIn(true);
       },
       onSuccess: () => {
-        console.log("Login Success");
         router.push('/dashboard')
         setIsLoggingIn(false);
       },

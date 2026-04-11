@@ -28,7 +28,6 @@ export const globalErrorHandler = (error: Error | ApiError | ZodError, req: Requ
         message = "A database error occurred while processing your request."
     }
 
-    console.log(error);
     res.status(statusCode).json({
         success: false,
         data: null,

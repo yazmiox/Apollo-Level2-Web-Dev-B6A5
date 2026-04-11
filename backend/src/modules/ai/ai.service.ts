@@ -186,7 +186,6 @@ export const getSearchSuggestions = async (q: string) => {
 
         return getFallbackSuggestions(normalizedQuery, contextItems, contextCategories);
     } catch (error) {
-        console.error("AI Error:", error);
         return getFallbackSuggestions(normalizedQuery, contextItems, contextCategories);
     }
 }

@@ -205,7 +205,6 @@ Return JSON in this exact format:
 
         return getFallbackResponse(normalizedMessage);
     } catch (error) {
-        console.error("AI Chat Error:", error);
         return getFallbackResponse(normalizedMessage);
     }
 };

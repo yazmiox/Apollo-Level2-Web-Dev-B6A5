@@ -8,7 +8,6 @@ export const getCustomers = async () => {
         const response = await httpClient.get<CustomerStats[]>("/customers");
         return response;
     } catch (error) {
-        console.error("Error fetching customers:", error);
         return { success: false, data: [], message: "Failed to fetch customers" };
     }
 }

@@ -63,9 +63,6 @@ export async function getAiSuggestions(query: string, signal?: AbortSignal): Pro
             )
             .slice(0, 5);
     } catch (error) {
-        if ((error as Error).name !== "AbortError") {
-            console.error("Suggestions fetch error:", error);
-        }
         return [];
     }
 }
@@ -124,9 +121,6 @@ export async function sendAiChatMessage(
             suggestions: Array.isArray(data.data.suggestions) ? data.data.suggestions.slice(0, 3) : [],
         };
     } catch (error) {
-        if ((error as Error).name !== "AbortError") {
-            console.error("Chat fetch error:", error);
-        }
         return {
             reply: "Something went wrong while contacting the assistant. Please try again.",
             suggestions: [],
