@@ -42,23 +42,23 @@ export default function RegisterPage() {
     })
   };
 
-  const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: process.env.NEXT_PUBLIC_APP_URL + "/dashboard"
-    }, {
-      onRequest: () => {
-        setIsGoogleLoggingIn(true);
-      },
-      onSuccess: () => {
-        setIsGoogleLoggingIn(false);
-      },
-      onError: (ctx) => {
-        setError(ctx.error.message);
-        setIsGoogleLoggingIn(false);
-      }
-    })
-  };
+  // const handleGoogleSignIn = async () => {
+  //   await authClient.signIn.social({
+  //     provider: "google",
+  //     callbackURL: process.env.NEXT_PUBLIC_APP_URL + "/dashboard"
+  //   }, {
+  //     onRequest: () => {
+  //       setIsGoogleLoggingIn(true);
+  //     },
+  //     onSuccess: () => {
+  //       setIsGoogleLoggingIn(false);
+  //     },
+  //     onError: (ctx) => {
+  //       setError(ctx.error.message);
+  //       setIsGoogleLoggingIn(false);
+  //     }
+  //   })
+  // };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f4f1ed]">
@@ -93,8 +93,8 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setRole("user")}
                   className={`flex flex-col items-center gap-2 rounded-xl border p-3 pt-4 transition-all ${role === "user"
-                      ? "border-[#e8612e] bg-[#fdf5f2] ring-1 ring-[#e8612e]"
-                      : "border-[#e0dbd3] bg-white hover:bg-[#f9f8f6]"
+                    ? "border-[#e8612e] bg-[#fdf5f2] ring-1 ring-[#e8612e]"
+                    : "border-[#e0dbd3] bg-white hover:bg-[#f9f8f6]"
                     }`}
                 >
                   <UserIcon size={20} className={role === "user" ? "text-[#e8612e]" : "text-[#aaa]"} />
@@ -106,8 +106,8 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setRole("vendor")}
                   className={`flex flex-col items-center gap-2 rounded-xl border p-3 pt-4 transition-all ${role === "vendor"
-                      ? "border-[#e8612e] bg-[#fdf5f2] ring-1 ring-[#e8612e]"
-                      : "border-[#e0dbd3] bg-white hover:bg-[#f9f8f6]"
+                    ? "border-[#e8612e] bg-[#fdf5f2] ring-1 ring-[#e8612e]"
+                    : "border-[#e0dbd3] bg-white hover:bg-[#f9f8f6]"
                     }`}
                 >
                   <Store size={20} className={role === "vendor" ? "text-[#e8612e]" : "text-[#aaa]"} />
@@ -188,7 +188,7 @@ export default function RegisterPage() {
               </button>
             </form>
 
-            <div className="mt-8 flex items-center gap-4">
+            {/* <div className="mt-8 flex items-center gap-4">
               <div className="h-px flex-1 bg-[#f0ece5]" />
               <span className="text-xs font-semibold uppercase tracking-wider text-[#aaa]">or sign up with</span>
               <div className="h-px flex-1 bg-[#f0ece5]" />
@@ -215,7 +215,7 @@ export default function RegisterPage() {
                   Google
                 </>
               )}
-            </button>
+            </button> */}
 
             <p className="mt-8 text-center text-sm text-[#777]">
               Already have an account?{" "}

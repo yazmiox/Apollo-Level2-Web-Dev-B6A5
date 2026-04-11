@@ -10,12 +10,12 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
-    socialProviders: {
-        google: {
-            clientId: GOOGLE_CLIENT_ID!,
-            clientSecret: GOOGLE_CLIENT_SECRET!,
-        },
-    },
+    // socialProviders: {
+    //     google: {
+    //         clientId: GOOGLE_CLIENT_ID!,
+    //         clientSecret: GOOGLE_CLIENT_SECRET!,
+    //     },
+    // },
     user: {
         additionalFields: {
             role: {
