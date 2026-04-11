@@ -55,17 +55,5 @@ export const auth = betterAuth({
         sendOnSignUp: true,
         autoSignInAfterVerification: true
     },
-    // advanced: {
-    //     cookies: {
-    //         state: {
-    //             attributes: {
-    //                 sameSite: "none",
-    //                 secure: true,
-    //                 httpOnly: true,
-    //                 path: "/",
-    //             }
-    //         }
-    //     }
-    // },
     trustedOrigins: [CLIENT_URL!],
 })
