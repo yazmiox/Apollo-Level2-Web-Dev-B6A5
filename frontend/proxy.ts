@@ -8,7 +8,8 @@ export default async function proxy(req: NextRequest) {
     const path = req.nextUrl.pathname
     const isProtectedRoute = protectedRoutes.includes(path)
     const isPublicRoute = publicRoutes.includes(path)
-    const cookie = (await cookies()).get('better-auth.session_token')?.value
+    const cookieStore = await cookies()
+    const cookie = (cookieStore.get('better-auth.session_token') || cookieStore.get('__Secure-better-auth.session_token'))?.value
 
     if (isProtectedRoute && !cookie) {
         return NextResponse.redirect(new URL('/login', req.nextUrl))
